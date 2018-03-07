@@ -27,11 +27,11 @@ greeting "Foo"
 ```
 
 > # Biscotti
-
+>
 > _Embed executable CoffeeScript in your Markdown._
-
+>
 > I'd like to welcome you. I don't know your name, though, so I'll just call you Foo.
-
+>
 > Hello, Foo!
 
 How about we break out Markdown file into more manageable pieces?
