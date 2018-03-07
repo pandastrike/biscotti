@@ -1,5 +1,7 @@
 ::: coffee
 
+import {Method} from "fairmont-multimethods"
+
 include "greeting"
 
 greeting "Foo"

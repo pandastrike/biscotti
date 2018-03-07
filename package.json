@@ -1,6 +1,6 @@
 {
   "name": "biscotti",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Embed executable CoffeeScript in your Markdown.",
   "main": "build/npm/src/index.js",
   "dependencies": {},
@@ -8,6 +8,7 @@
     "babel-core": "^6.26.0",
     "babel-preset-env": "^1.6.1",
     "coffeescript": "^2.2.2",
+    "fairmont-multimethods": "^2.0.2",
     "gulp": "github:gulpjs/gulp#4.0",
     "markdown-it": "^8.4.1",
     "panda-builder": "^1.1.1",

@@ -10,7 +10,7 @@ md = do (parser = markdownIt()) ->
 path = resolve "./test/files/index.bisc"
 
 output = biscotti md
-.context path
+.context path, require
 .render fs.readFileSync path, "utf8"
 
 assert.equal output,

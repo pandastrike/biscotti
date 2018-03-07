@@ -33,7 +33,7 @@ md = function (parser) {
 
 path = (0, _path.resolve)("./test/files/index.bisc");
 
-output = (0, _index2.default)(md).context(path).render(_fs2.default.readFileSync(path, "utf8"));
+output = (0, _index2.default)(md).context(path, require).render(_fs2.default.readFileSync(path, "utf8"));
 
 _powerAssert2.default.equal(_rec._expr(_rec._capt(output, "arguments/0"), {
   content: "assert.equal(output, '<p>Hello, Foo!</p>\\n')",

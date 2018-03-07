@@ -5,12 +5,13 @@ import coffeescript from "coffeescript"
 
 biscotti = (md) ->
 
-  context: (path) ->
+  context: (path, require) ->
 
     buffer = ""
     paths = [ cwd = dirname path ]
 
     sandbox = vm.createContext
+      require: require
       append: (f) -> -> buffer += f arguments...
       include: (_path) ->
         _path = if _path[0] == "/"
@@ -18,7 +19,15 @@ biscotti = (md) ->
         else
           resolve cwd, _path
 
-        for p in [ _path, "#{_path}.bisc", "#{_path}/index.bisc" ]
+        _paths = [
+          _path
+          "#{_path}.bisc"
+          "#{_path}/index.bisc"
+          "#{_path}.md"
+          "#{_path}/index.md"
+       ]
+
+        for p in _paths
           try
             contents = fs.readFileSync p, "utf8"
             break

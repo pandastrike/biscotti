@@ -25,22 +25,23 @@ var biscotti;
 
 exports.default = biscotti = function (md) {
   return {
-    context: function (path) {
+    context: function (path, require) {
       var buffer, cwd, paths, process, sandbox;
       buffer = "";
       paths = [cwd = (0, _path2.dirname)(path)];
       sandbox = _vm2.default.createContext({
+        require: require,
         append: function (f) {
           return function () {
             return buffer += f(...arguments);
           };
         },
         include: function (_path) {
-          var contents, i, len, p, ref;
+          var _paths, contents, i, len, p;
           _path = _path[0] === "/" ? _path : (0, _path2.resolve)(cwd, _path);
-          ref = [_path, `${_path}.bisc`, `${_path}/index.bisc`];
-          for (i = 0, len = ref.length; i < len; i++) {
-            p = ref[i];
+          _paths = [_path, `${_path}.bisc`, `${_path}/index.bisc`, `${_path}.md`, `${_path}/index.md`];
+          for (i = 0, len = _paths.length; i < len; i++) {
+            p = _paths[i];
             try {
               contents = _fs2.default.readFileSync(p, "utf8");
               break;

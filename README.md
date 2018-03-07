@@ -52,6 +52,17 @@ include "chapter-3"
 
 ```
 
+You can also use `import` to reuse code from other modules.
+
+```markdown
+
+::: coffee import {chapter} from "my-biscotti-helpers" :::
+
+# ::: coffee chapter title: "Once Upon A Time" :::
+
+Once upon a time, in a land far, far away…
+```
+
 ## Installation
 
 It's the usual NPM deal.
