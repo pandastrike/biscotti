@@ -1,0 +1,7 @@
+::: coffee
+
+include "greeting"
+
+greeting "Foo"
+
+:::

@@ -1,0 +1,36 @@
+{
+  "name": "biscotti",
+  "version": "1.0.0",
+  "description": "Embed executable CoffeeScript in your Markdown.",
+  "main": "build/npm/index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "coffeescript": "^2.2.2",
+    "gulp": "github:gulpjs/gulp#4.0",
+    "markdown-it": "^8.4.1",
+    "panda-builder": "^1.1.1",
+    "power-assert": "^1.4.4"
+  },
+  "scripts": {
+    "test": "gulp npm:test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pandastrike/biscotti.git"
+  },
+  "keywords": [
+    "markdown",
+    "coffeescript",
+    "embed",
+    "interactive",
+    "notebook"
+  ],
+  "author": "Dan Yoder",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pandastrike/biscotti/issues"
+  },
+  "homepage": "https://github.com/pandastrike/biscotti#readme"
+}

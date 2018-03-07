@@ -1,0 +1,5 @@
+::: coffee
+
+greeting = append (name) -> "Hello, #{name}!"
+
+:::
