@@ -52,7 +52,7 @@ include "chapter-3"
 
 ```
 
-You can also use `import` to reuse code from other modules.
+You can also use `import` to reuse code from other modules. You just need to pass in an implementation of `require` to a Biscotti instance's `context` method.
 
 ```markdown
 
@@ -87,7 +87,7 @@ md = do (parser = markdownIt()) ->
 path = resolve "./test/files/index.bisc"
 
 output = biscotti md
-.context path # so you can reuse a vm sandbox if you want
+.context path, require # you can reuse a context if you want
 .render fs.readFileSync path, "utf8"
 
 assert.equal output,
