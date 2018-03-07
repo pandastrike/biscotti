@@ -1,8 +1,8 @@
 {
   "name": "biscotti",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Embed executable CoffeeScript in your Markdown.",
-  "main": "build/npm/index.js",
+  "main": "build/npm/src/index.js",
   "dependencies": {},
   "devDependencies": {
     "babel-core": "^6.26.0",
