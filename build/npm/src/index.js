@@ -21,60 +21,119 @@ var _coffeescript2 = _interopRequireDefault(_coffeescript);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var biscotti;
+var biscotti, log;
+
+log = function () {
+  return console.error(...arguments);
+};
 
 exports.default = biscotti = function (md) {
   return {
     context: function (path, require) {
-      var buffer, cwd, paths, process, sandbox;
-      buffer = "";
-      paths = [cwd = (0, _path2.dirname)(path)];
+      var append, block, buffered, buffers, cd, collate, compile, contexts, cwd, finish, pop, process, push, read, replace, resolve, run, sandbox, start;
+      buffers = [];
+      block = 0;
+      start = function () {
+        return buffers[block] = [];
+      };
+      append = function (f) {
+        return function () {
+          return buffers[block].push(f(...arguments));
+        };
+      };
+      collate = function (content, buffer) {
+        return content += buffer;
+      };
+      finish = function () {
+        return buffers[block++].reduce(collate, "");
+      };
+      buffered = function (f) {
+        start();
+        f();
+        return finish();
+      };
+      contexts = [];
+      push = function (path) {
+        return contexts.push([block, path]);
+      };
+      pop = function () {
+        [block, path] = contexts.pop();
+        return path;
+      };
+      cwd = (0, _path2.dirname)(path);
+      push(cwd);
+      cd = function (path, f) {
+        var output;
+        push(cwd);
+        cwd = (0, _path2.dirname)(path);
+        output = f();
+        cwd = pop();
+        return output;
+      };
+      resolve = function (path) {
+        if (path[0] === "/") {
+          return path;
+        } else {
+          return (0, _path2.resolve)(cwd, path);
+        }
+      };
+      read = function (path) {
+        var _path, contents, i, len, paths;
+        paths = [path, `${path}.bisc`, `${path}/index.bisc`, `${path}.md`, `${path}/index.md`];
+        for (i = 0, len = paths.length; i < len; i++) {
+          _path = paths[i];
+          try {
+            contents = _fs2.default.readFileSync(_path, "utf8");
+            break;
+          } catch (error) {}
+        }
+        if (contents != null) {
+          return contents;
+        } else {
+          throw new Error(`biscotti: [${path}] not found`);
+        }
+      };
+      compile = function (cs) {
+        return _coffeescript2.default.compile(cs, {
+          bare: true,
+          transpile: {
+            presets: [['env', {
+              targets: {
+                node: "6.10"
+              }
+            }]]
+          }
+        });
+      };
       sandbox = _vm2.default.createContext({
         require: require,
-        append: function (f) {
-          return function () {
-            return buffer += f(...arguments);
-          };
-        },
-        include: function (_path) {
-          var _paths, contents, i, len, p;
-          _path = _path[0] === "/" ? _path : (0, _path2.resolve)(cwd, _path);
-          _paths = [_path, `${_path}.bisc`, `${_path}/index.bisc`, `${_path}.md`, `${_path}/index.md`];
-          for (i = 0, len = _paths.length; i < len; i++) {
-            p = _paths[i];
-            try {
-              contents = _fs2.default.readFileSync(p, "utf8");
-              break;
-            } catch (error) {}
-          }
-          if (contents != null) {
-            paths.push(cwd = (0, _path2.dirname)(p));
-            buffer += process(contents);
-            return cwd = paths.pop();
-          } else {
-            throw new Error(`biscotti: [${_path}] not found`);
-          }
+        append: append,
+        include: function (path) {
+          return append(function () {
+            var _path;
+            _path = resolve(path);
+            return cd((0, _path2.dirname)(_path), function () {
+              return process(read(_path));
+            });
+          })();
         }
       });
+      run = function (js) {
+        return _vm2.default.runInContext(js, sandbox, {
+          filename: cwd,
+          displayErrors: true
+        });
+      };
+      replace = function (contents, f) {
+        return contents.replace(/::: coffee\s([^]*?)\s^:::/gm, function (...args) {
+          return f(args[1]);
+        });
+      };
       process = function (contents) {
-        return contents.replace(/::: coffee\s([^]*?)\s^:::/gm, function (_, cs) {
-          var js;
-          js = _coffeescript2.default.compile(cs, {
-            bare: true,
-            transpile: {
-              presets: [['env', {
-                targets: {
-                  node: "6.10"
-                }
-              }]]
-            }
+        return replace(contents, function (cs) {
+          return buffered(function () {
+            return run(compile(cs));
           });
-          buffer = "";
-          _vm2.default.runInContext(js, sandbox, {
-            filename: path,
-            displayErrors: true
-          });
-          return buffer;
         });
       };
       return {
