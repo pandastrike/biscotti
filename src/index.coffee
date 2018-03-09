@@ -76,7 +76,7 @@ biscotti = (_require = require) ->
             action code
             promises = []
             while buffer.length > 0
-              promises.push buffer.pop()
+              promises.push buffer.shift()
             placeholder = "::#{insertions.length}::"
             insertions.push (text) ->
               buffered = await all promises

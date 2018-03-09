@@ -13,4 +13,4 @@ process = biscotti require
 
 do ->
   assert.equal (await process path),
-    '# Greetings!\n\n\n\n\nThis is a test.\n\nHello, Foo!\n'
+    '# Greetings!\n\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!\n'
