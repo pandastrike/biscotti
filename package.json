@@ -1,6 +1,6 @@
 {
   "name": "biscotti",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Like M4, but in CoffeeScript.",
   "main": "build/npm/src/index.js",
   "dependencies": {
