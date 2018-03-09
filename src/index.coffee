@@ -5,7 +5,7 @@ import coffeescript from "coffeescript"
 
 log = -> console.error arguments...
 
-trim = (string) -> string.trim()
+trim = (string) -> do string.trim
 
 append = (to, from) -> to += from
 
@@ -15,9 +15,9 @@ all = (promises) ->
   else
     []
 
-biscotti = (_require = require) ->
+biscotti = (globals = {require}) ->
 
-  context = (require) ->
+  context = (globals) ->
 
     compile = (code, path) ->
       coffeescript.compile code,
@@ -26,7 +26,7 @@ biscotti = (_require = require) ->
         transpile:
           presets: [[ 'env', targets: node: "6.10" ]]
 
-    sandbox = vm.createContext require: require
+    sandbox = vm.createContext globals
     run = (code, path) ->
       vm.runInContext code, sandbox,
         filename: path
@@ -34,7 +34,7 @@ biscotti = (_require = require) ->
 
     # a document returns a promise
     # that resolves to a processed document
-    document = (path, {encoding = "utf8", open = "::", close} = {}) ->
+    document = (path, {encoding = "utf8", open = "::", close, text} = {}) ->
 
       close ?= open
 
@@ -69,7 +69,7 @@ biscotti = (_require = require) ->
 
       # a subdocument returns a promise
       # a resolves to a processed subdocument
-      subdocument = (path) ->
+      subdocument = (path, text) ->
 
         insertions = []
 
@@ -78,7 +78,7 @@ biscotti = (_require = require) ->
             action code
             promises = []
             while buffer.length > 0
-              promises.push buffer.shift()
+              promises.push do buffer.shift
             placeholder = "#{open}#{insertions.length}#{close}"
             insertions.push (text) ->
               buffered = await all promises
@@ -86,11 +86,9 @@ biscotti = (_require = require) ->
               text.replace ///#{placeholder}///gm, -> what
             placeholder
 
-        cd = (path, action) ->
-
         resolved = resolve path
         saved = cwd
-        text = trim read resolved
+        text ?= trim read resolved
         stripped = replace text, (code) -> run compile code
         cwd = saved
         result = stripped
@@ -106,12 +104,12 @@ biscotti = (_require = require) ->
       Object.assign sandbox,
         out
         $: out
-        include: (path) -> do out -> subdocument path, cwd
+        include: (path) -> do out -> subdocument path
 
-      subdocument path
+      subdocument path, text
 
     document
 
-  context _require
+  context globals
 
 export {biscotti as default}

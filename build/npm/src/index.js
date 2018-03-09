@@ -45,9 +45,9 @@ all = function (promises) {
   }
 };
 
-exports.default = biscotti = function (_require = require) {
+exports.default = biscotti = function (globals = { require }) {
   var context;
-  context = function (require) {
+  context = function (globals) {
     var compile, document, run, sandbox;
     compile = function (code, path) {
       return _coffeescript2.default.compile(code, {
@@ -62,9 +62,7 @@ exports.default = biscotti = function (_require = require) {
         }
       });
     };
-    sandbox = _vm2.default.createContext({
-      require: require
-    });
+    sandbox = _vm2.default.createContext(globals);
     run = function (code, path) {
       return _vm2.default.runInContext(code, sandbox, {
         filename: path,
@@ -73,7 +71,7 @@ exports.default = biscotti = function (_require = require) {
     };
     // a document returns a promise
     // that resolves to a processed document
-    document = function (path, { encoding = "utf8", open = "::", close } = {}) {
+    document = function (path, { encoding = "utf8", open = "::", close, text } = {}) {
       var buffer, cwd, offset, out, pattern, read, resolve, subdocument;
       if (close == null) {
         close = open;
@@ -106,8 +104,8 @@ exports.default = biscotti = function (_require = require) {
       // a subdocument returns a promise
       // a resolves to a processed subdocument
       subdocument = (() => {
-        var _ref = _asyncToGenerator(function* (path) {
-          var cd, cwd, i, insertion, insertions, len, replace, resolved, result, saved, stripped, text;
+        var _ref = _asyncToGenerator(function* (path, text) {
+          var cwd, i, insertion, insertions, len, replace, resolved, result, saved, stripped;
           insertions = [];
           replace = function (text, action) {
             return text.replace(pattern, function (_, code) {
@@ -128,17 +126,18 @@ exports.default = biscotti = function (_require = require) {
                   });
                 });
 
-                return function (_x2) {
+                return function (_x3) {
                   return _ref2.apply(this, arguments);
                 };
               })());
               return placeholder;
             });
           };
-          cd = function (path, action) {};
           resolved = resolve(path);
           saved = cwd;
-          text = trim(read(resolved));
+          if (text == null) {
+            text = trim(read(resolved));
+          }
           stripped = replace(text, function (code) {
             return run(compile(code));
           });
@@ -151,7 +150,7 @@ exports.default = biscotti = function (_require = require) {
           return result;
         });
 
-        return function subdocument(_x) {
+        return function subdocument(_x, _x2) {
           return _ref.apply(this, arguments);
         };
       })();
@@ -166,15 +165,15 @@ exports.default = biscotti = function (_require = require) {
         $: out,
         include: function (path) {
           return out(function () {
-            return subdocument(path, cwd);
+            return subdocument(path);
           })();
         }
       });
-      return subdocument(path);
+      return subdocument(path, text);
     };
     return document;
   };
-  return context(_require);
+  return context(globals);
 };
 
 exports.default = biscotti;

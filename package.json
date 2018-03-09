@@ -1,6 +1,6 @@
 {
   "name": "biscotti",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Like M4, but in CoffeeScript.",
   "main": "build/npm/src/index.js",
   "dependencies": {
@@ -11,7 +11,6 @@
   "devDependencies": {
     "fairmont-multimethods": "^2.0.2",
     "gulp": "github:gulpjs/gulp#4.0",
-    "markdown-it": "^8.4.1",
     "panda-builder": "^1.1.1",
     "power-assert": "^1.4.4"
   },

@@ -80,8 +80,34 @@ import fs from "fs"
 import biscotti from "../src/index"
 
 # pass in your require to import local packages
-process = biscotti require
+process = biscotti {require}
 
 # returns post-processed result
 process "./my-novel.bisc"
 ```
+
+## API
+
+### _biscotti [globals] &rarr; processor_
+
+- _globals_ - An object whose properties will be available as global variables in a document's execution context. If you want to use `import`, you'll want to provide a `require` property, which should be a Node-compatible `require` function that takes a module name or absolute or relative path and returns the corresponding module's exports. Defaults to use the module's own `require`.
+
+- _processor_ - a function for processing documents.
+
+The default export of the biscotti module is a function that takes an optional `require` function and returns a processor function. What that means is that any updates to globals will be carried over from one call to the next.
+
+A processor keeps its execution sanbox across invocations.
+
+### _processor path, [options] &rarr; processed-document_
+
+- _options_ - An object describing options for processing a given document.
+
+  - _text_ - If you already have the document you want to process in memory, you can simply pass it as an option. In this case, the _path_ argument is used only to resolve includes and for error messages. Defaults to the contents of the file at _path_.
+
+  - _encoding_ - String that determines the encoding used when reading the file. Defaults to `utf8`. Ingored when `text` option is provided.
+
+  - _open_ - String determining the open delimiter for code blocks. Defaults to `::`.
+
+  - _close_ - String determining the close delimiter for code blocks. Defaults to the value of _open_.
+
+- _processed-document_ -
