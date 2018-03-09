@@ -1,36 +1,33 @@
 # Biscotti
 
-_Embed executable CoffeeScript in your Markdown._
+_Like M4, but in CoffeeScript._
 
-This is probably a thing you have never thought of doing or have always dreamt of doing, depending on how crazy you are.
+Put CoffeeScript in your Markdown or YAML…or anywhere else! This is probably a thing you have never thought of doing or have always dreamt of doing, depending on your tolerance for madness.
 
-Let's define a simple `greeting` function we can use in our document.
+If you're familiar with [M4](https://www.gnu.org/software/m4/manual/m4.html), just imagine that, but with CoffeeScript, complete with full the latest EcmaScript goodies, including Promises and `import`.
+
+If you're not familiar with M4, or your only familiarity with it is because `make config` didn't work, imagine a templating language like Handlebars, except that it laughs in face of phrases like “logicless templates.”
+
+Suppose we're writing in Markdown, and we get tired of writing the Markdown for greetings. (I know, implausible, but just go with it.) We can define a simple `greeting` function we can use anywhere in our document.
 
 ```markdown
 # Biscotti
 
-_Embed executable CoffeeScript in your Markdown._
+_Like M4, but in CoffeeScript._
 
-::: coffee
+:: greeting = $ (name) -> "Hello, #{name}!" ::
 
-greeting = append (name) -> "Hello, #{name}!"
+That little `$` is a “built-in” that takes the result of the function and includes it in the output that will replace our code block. (If for some reason, you wanted to load JQuery, `$` is an alias for `out`.)
 
-:::
+Suppose we want to welcome our friend Foo. (Like I said, just go with it.) We can just invoke our function.
 
-I'd like to welcome you. I don't know your name, though, so I'll just call you Foo.
-
-::: coffee
-
-greeting "Foo"
-
-:::
+:: greeting "Foo" ::
 ```
 
 > # Biscotti
 >
 > _Embed executable CoffeeScript in your Markdown._
 >
-> I'd like to welcome you. I don't know your name, though, so I'll just call you Foo.
 >
 > Hello, Foo!
 
@@ -41,24 +38,26 @@ How about we break out Markdown file into more manageable pieces?
 
 _by Snoopy_
 
-::: coffee
+::
 
 include "chapter-1"
 include "chapter-2"
 include "chapter-3"
 # you get the idea...
 
-:::
+::
 
 ```
+
+And, yup, `include` is another built-in.
 
 You can also use `import` to reuse code from other modules. You just need to pass in an implementation of `require` to a Biscotti instance's `context` method.
 
 ```markdown
 
-::: coffee import {chapter} from "my-biscotti-helpers" :::
+:: import {chapter} from "my-biscotti-helpers" ::
 
-# ::: coffee chapter title: "Once Upon A Time" :::
+# :: coffee chapter title: "Once Upon A Time" ::
 
 Once upon a time, in a land far, far away…
 ```
@@ -76,28 +75,9 @@ import assert from "assert"
 import {resolve} from "path"
 import fs from "fs"
 import biscotti from "../src/index"
-import markdownIt from "markdown-it"
 
-# choose whichever Markdown parser you prefer...
-# Biscotti just needs a function that will accept
-# Markdown and render it...
-md = do (parser = markdownIt()) ->
-  (markdown) -> parser.render markdown
+process = biscotti require
 
-path = resolve "./test/files/index.bisc"
-
-output = biscotti md
-.context path, require # you can reuse a context if you want
-.render fs.readFileSync path, "utf8"
-
-assert.equal output,
-  '<p>Hello, Foo!</p>\n'
+# returns post-processed result
+process "./my-novel.bisc"
 ```
-
-## Markdown API
-
-Right now, Biscotti bundles two built-in functions you can use from within your Markdown documents. (Of course, you can define however many you like.)
-
-- _append_ - Takes a function and returns a function that will append to the render buffer. So if you have a function that, say, generates some Markdown, you can wrap it with `append` so that the Markdown will render.
-
-- _include_ - Takes a path and embeds the document within this document. You can use relative or absolute paths. Extension is optional, assumes `.bisc`. Will also attempt to load `index.bisc` if you give it a directory.
