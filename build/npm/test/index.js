@@ -40,9 +40,9 @@ _asyncToGenerator(function* () {
   var _rec = new _powerAssertRecorder();
 
   return _powerAssert2.default.equal(_rec._expr(_rec._capt((yield process(_rec._capt(path, "arguments/0/argument/arguments/0"))), "arguments/0"), {
-    content: "assert.equal((await process(path)), '# Greetings!\\n\\n\\n\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!\\n')",
+    content: "assert.equal((await process(path)), '# Greetings!\\n\\n\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
     filepath: "index.coffee",
     line: 15,
     async: true
-  }), '# Greetings!\n\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!\n');
+  }), '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
 })();

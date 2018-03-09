@@ -23,10 +23,14 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
 
-var all, append, biscotti, log;
+var all, append, biscotti, log, trim;
 
 log = function () {
   return console.error(...arguments);
+};
+
+trim = function (string) {
+  return string.trim();
 };
 
 append = function (to, from) {
@@ -113,7 +117,7 @@ exports.default = biscotti = function (_require = require) {
               while (buffer.length > 0) {
                 promises.push(buffer.shift());
               }
-              placeholder = `::${insertions.length}::`;
+              placeholder = `${open}${insertions.length}${close}`;
               insertions.push((() => {
                 var _ref2 = _asyncToGenerator(function* (text) {
                   var buffered, what;
@@ -134,7 +138,7 @@ exports.default = biscotti = function (_require = require) {
           cd = function (path, action) {};
           resolved = resolve(path);
           saved = cwd;
-          text = read(resolved);
+          text = trim(read(resolved));
           stripped = replace(text, function (code) {
             return run(compile(code));
           });

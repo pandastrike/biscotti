@@ -5,6 +5,8 @@ import coffeescript from "coffeescript"
 
 log = -> console.error arguments...
 
+trim = (string) -> string.trim()
+
 append = (to, from) -> to += from
 
 all = (promises) ->
@@ -77,7 +79,7 @@ biscotti = (_require = require) ->
             promises = []
             while buffer.length > 0
               promises.push buffer.shift()
-            placeholder = "::#{insertions.length}::"
+            placeholder = "#{open}#{insertions.length}#{close}"
             insertions.push (text) ->
               buffered = await all promises
               what = buffered.reduce append, ""
@@ -88,7 +90,7 @@ biscotti = (_require = require) ->
 
         resolved = resolve path
         saved = cwd
-        text = read resolved
+        text = trim read resolved
         stripped = replace text, (code) -> run compile code
         cwd = saved
         result = stripped
