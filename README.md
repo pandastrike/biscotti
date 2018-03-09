@@ -17,10 +17,13 @@ _Like M4, but in CoffeeScript._
 
 :: greeting = $ (name) -> "Hello, #{name}!" ::
 
+```
+
 That little `$` is a “built-in” that takes the result of the function and includes it in the output that will replace our code block. (If for some reason, you wanted to load JQuery, `$` is an alias for `out`.)
 
 Suppose we want to welcome our friend Foo. (Like I said, just go with it.) We can just invoke our function.
 
+```
 :: greeting "Foo" ::
 ```
 
@@ -76,6 +79,7 @@ import {resolve} from "path"
 import fs from "fs"
 import biscotti from "../src/index"
 
+# pass in your require to import local packages
 process = biscotti require
 
 # returns post-processed result
