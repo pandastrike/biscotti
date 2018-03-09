@@ -5,83 +5,111 @@ import coffeescript from "coffeescript"
 
 log = -> console.error arguments...
 
-biscotti = (md) ->
+append = (to, from) -> to += from
 
-  context: (path, require) ->
+all = (promises) ->
+  if promises?
+    Promise.all promises
+  else
+    []
 
-    buffers = []
-    block = 0
-    start = -> buffers[block] = []
-    append = (f) -> -> buffers[block].push f arguments...
-    collate = (content, buffer) -> content += buffer
-    finish = -> buffers[block++].reduce collate, ""
-    buffered = (f) ->
-      start()
-      do f
-      finish()
+biscotti = (_require = require) ->
 
-    contexts = []
-    push = (path) -> contexts.push [ block, path ]
-    pop = ->
-      [block, path ] = contexts.pop()
-      path
-    cwd = dirname path
-    push cwd
-    cd = (path, f) ->
-      push cwd
-      cwd = dirname path
-      output = do f
-      cwd = pop()
-      output
-    resolve = (path) ->
-      if path[0] == "/"
-        path
-      else
-        $resolve cwd, path
-    read = (path) ->
-      paths = [
-        path
-        "#{path}.bisc"
-        "#{path}/index.bisc"
-        "#{path}.md"
-        "#{path}/index.md"
-     ]
+  context = (require) ->
 
-      for _path in paths
-        try
-          contents = fs.readFileSync _path, "utf8"
-          break
-
-      if contents?
-        contents
-      else
-        throw new Error "biscotti: [#{path}] not found"
-
-    compile = (cs) ->
-      coffeescript.compile cs,
+    compile = (code, path) ->
+      coffeescript.compile code,
         bare: true
+        filename: path
         transpile:
           presets: [[ 'env', targets: node: "6.10" ]]
-    sandbox = vm.createContext
-      require: require
-      append: append
-      include: (path) ->
-        do append ->
-          _path = resolve path
-          cd (dirname _path), ->
-            process read _path
-    run = (js) ->
-      vm.runInContext js, sandbox,
-        filename: cwd
+
+    sandbox = vm.createContext require: require
+    run = (code, path) ->
+      vm.runInContext code, sandbox,
+        filename: path
         displayErrors: true
 
-    replace = (contents, f) ->
-      contents.replace /::: coffee\s([^]*?)\s^:::/gm, (args...) -> f args[1]
+    # a document returns a promise
+    # that resolves to a processed document
+    document = (path, {encoding = "utf8", open = "::", close} = {}) ->
 
-    process = (contents) ->
-      replace contents, (cs) ->
-        buffered -> run compile cs
+      close ?= open
 
-    render: (contents) -> md process contents
+      offset = 0
+
+      pattern = ///#{open}\s*([^]*?)\s*#{close}///gm
+
+      resolve = (path) ->
+        if path[0] == "/"
+          path
+        else
+          $resolve cwd, path
+
+      read = (path) ->
+        paths = [
+          path
+          "#{path}.bisc"
+          "#{path}/index.bisc"
+          "#{path}.md"
+          "#{path}/index.md"
+        ]
+
+        for _path in paths
+          try
+            contents = fs.readFileSync _path, encoding
+            break
+
+        if contents?
+          contents
+        else
+          throw new Error "biscotti: [#{path}] not found"
+
+      # a subdocument returns a promise
+      # a resolves to a processed subdocument
+      subdocument = (path) ->
+
+        insertions = []
+
+        replace = (text, action) ->
+          text.replace pattern, (_, code) ->
+            action code
+            promises = []
+            while buffer.length > 0
+              promises.push buffer.pop()
+            placeholder = "::#{insertions.length}::"
+            insertions.push (text) ->
+              buffered = await all promises
+              what = buffered.reduce append, ""
+              text.replace ///#{placeholder}///gm, -> what
+            placeholder
+
+        cd = (path, action) ->
+
+        resolved = resolve path
+        saved = cwd
+        text = read resolved
+        stripped = replace text, (code) -> run compile code
+        cwd = saved
+        result = stripped
+        for insertion in insertions
+          result = await insertion result
+        result
+
+      cwd = dirname path
+      buffer = []
+
+      out = (f) -> -> buffer.push f arguments...
+
+      Object.assign sandbox,
+        out
+        $: out
+        include: (path) -> do out -> subdocument path, cwd
+
+      subdocument path
+
+    document
+
+  context _require
 
 export {biscotti as default}

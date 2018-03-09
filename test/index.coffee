@@ -9,9 +9,8 @@ md = do (parser = markdownIt()) ->
 
 path = resolve "./test/files/index.bisc"
 
-output = biscotti md
-.context path, require
-.render fs.readFileSync path, "utf8"
+process = biscotti require
 
-assert.equal output,
-  '<p>Hello, Foo!</p>\n'
+do ->
+  assert.equal (await process path),
+    '# Greetings!\n\n\n\n\nThis is a test.\n\nHello, Foo!\n'

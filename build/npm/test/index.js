@@ -1,7 +1,6 @@
 "use strict";
 
-var _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { var capturedValues = this.captured; this.captured = []; return { powerAssertContext: { value: value, events: capturedValues }, source: source }; }; return PowerAssertRecorder; }(),
-    _rec = new _powerAssertRecorder();
+var _powerAssertRecorder = function () { function PowerAssertRecorder() { this.captured = []; } PowerAssertRecorder.prototype._capt = function _capt(value, espath) { this.captured.push({ value: value, espath: espath }); return value; }; PowerAssertRecorder.prototype._expr = function _expr(value, source) { var capturedValues = this.captured; this.captured = []; return { powerAssertContext: { value: value, events: capturedValues }, source: source }; }; return PowerAssertRecorder; }();
 
 var _powerAssert = require("power-assert");
 
@@ -23,7 +22,9 @@ var _markdownIt2 = _interopRequireDefault(_markdownIt);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var md, output, path;
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+var md, path, process;
 
 md = function (parser) {
   return function (markdown) {
@@ -33,10 +34,15 @@ md = function (parser) {
 
 path = (0, _path.resolve)("./test/files/index.bisc");
 
-output = (0, _index2.default)(md).context(path, require).render(_fs2.default.readFileSync(path, "utf8"));
+process = (0, _index2.default)(require);
 
-_powerAssert2.default.equal(_rec._expr(_rec._capt(output, "arguments/0"), {
-  content: "assert.equal(output, '<p>Hello, Foo!</p>\\n')",
-  filepath: "index.coffee",
-  line: 16
-}), '<p>Hello, Foo!</p>\n');
+_asyncToGenerator(function* () {
+  var _rec = new _powerAssertRecorder();
+
+  return _powerAssert2.default.equal(_rec._expr(_rec._capt((yield process(_rec._capt(path, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+    content: "assert.equal((await process(path)), '# Greetings!\\n\\n\\n\\n\\nThis is a test.\\n\\nHello, Foo!\\n')",
+    filepath: "index.coffee",
+    line: 15,
+    async: true
+  }), '# Greetings!\n\n\n\n\nThis is a test.\n\nHello, Foo!\n');
+})();

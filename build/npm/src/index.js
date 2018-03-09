@@ -21,55 +21,61 @@ var _coffeescript2 = _interopRequireDefault(_coffeescript);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var biscotti, log;
+function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+
+var all, append, biscotti, log;
 
 log = function () {
   return console.error(...arguments);
 };
 
-exports.default = biscotti = function (md) {
-  return {
-    context: function (path, require) {
-      var append, block, buffered, buffers, cd, collate, compile, contexts, cwd, finish, pop, process, push, read, replace, resolve, run, sandbox, start;
-      buffers = [];
-      block = 0;
-      start = function () {
-        return buffers[block] = [];
-      };
-      append = function (f) {
-        return function () {
-          return buffers[block].push(f(...arguments));
-        };
-      };
-      collate = function (content, buffer) {
-        return content += buffer;
-      };
-      finish = function () {
-        return buffers[block++].reduce(collate, "");
-      };
-      buffered = function (f) {
-        start();
-        f();
-        return finish();
-      };
-      contexts = [];
-      push = function (path) {
-        return contexts.push([block, path]);
-      };
-      pop = function () {
-        [block, path] = contexts.pop();
-        return path;
-      };
-      cwd = (0, _path2.dirname)(path);
-      push(cwd);
-      cd = function (path, f) {
-        var output;
-        push(cwd);
-        cwd = (0, _path2.dirname)(path);
-        output = f();
-        cwd = pop();
-        return output;
-      };
+append = function (to, from) {
+  return to += from;
+};
+
+all = function (promises) {
+  if (promises != null) {
+    return Promise.all(promises);
+  } else {
+    return [];
+  }
+};
+
+exports.default = biscotti = function (_require = require) {
+  var context;
+  context = function (require) {
+    var compile, document, run, sandbox;
+    compile = function (code, path) {
+      return _coffeescript2.default.compile(code, {
+        bare: true,
+        filename: path,
+        transpile: {
+          presets: [['env', {
+            targets: {
+              node: "6.10"
+            }
+          }]]
+        }
+      });
+    };
+    sandbox = _vm2.default.createContext({
+      require: require
+    });
+    run = function (code, path) {
+      return _vm2.default.runInContext(code, sandbox, {
+        filename: path,
+        displayErrors: true
+      });
+    };
+    // a document returns a promise
+    // that resolves to a processed document
+    document = function (path, { encoding = "utf8", open = "::", close } = {}) {
+      var buffer, cwd, offset, out, pattern, read, resolve, subdocument;
+      if (close == null) {
+        close = open;
+      }
+      offset = 0;
+      pattern = RegExp(`${open}\\s*([^]*?)\\s*${close}`, "gm");
       resolve = function (path) {
         if (path[0] === "/") {
           return path;
@@ -83,7 +89,7 @@ exports.default = biscotti = function (md) {
         for (i = 0, len = paths.length; i < len; i++) {
           _path = paths[i];
           try {
-            contents = _fs2.default.readFileSync(_path, "utf8");
+            contents = _fs2.default.readFileSync(_path, encoding);
             break;
           } catch (error) {}
         }
@@ -93,56 +99,78 @@ exports.default = biscotti = function (md) {
           throw new Error(`biscotti: [${path}] not found`);
         }
       };
-      compile = function (cs) {
-        return _coffeescript2.default.compile(cs, {
-          bare: true,
-          transpile: {
-            presets: [['env', {
-              targets: {
-                node: "6.10"
+      // a subdocument returns a promise
+      // a resolves to a processed subdocument
+      subdocument = (() => {
+        var _ref = _asyncToGenerator(function* (path) {
+          var cd, cwd, i, insertion, insertions, len, replace, resolved, result, saved, stripped, text;
+          insertions = [];
+          replace = function (text, action) {
+            return text.replace(pattern, function (_, code) {
+              var placeholder, promises;
+              action(code);
+              promises = [];
+              while (buffer.length > 0) {
+                promises.push(buffer.pop());
               }
-            }]]
-          }
-        });
-      };
-      sandbox = _vm2.default.createContext({
-        require: require,
-        append: append,
-        include: function (path) {
-          return append(function () {
-            var _path;
-            _path = resolve(path);
-            return cd((0, _path2.dirname)(_path), function () {
-              return process(read(_path));
+              placeholder = `::${insertions.length}::`;
+              insertions.push((() => {
+                var _ref2 = _asyncToGenerator(function* (text) {
+                  var buffered, what;
+                  buffered = yield all(promises);
+                  what = buffered.reduce(append, "");
+                  return text.replace(RegExp(`${placeholder}`, "gm"), function () {
+                    return what;
+                  });
+                });
+
+                return function (_x2) {
+                  return _ref2.apply(this, arguments);
+                };
+              })());
+              return placeholder;
             });
+          };
+          cd = function (path, action) {};
+          resolved = resolve(path);
+          saved = cwd;
+          text = read(resolved);
+          stripped = replace(text, function (code) {
+            return run(compile(code));
+          });
+          cwd = saved;
+          result = stripped;
+          for (i = 0, len = insertions.length; i < len; i++) {
+            insertion = insertions[i];
+            result = yield insertion(result);
+          }
+          return result;
+        });
+
+        return function subdocument(_x) {
+          return _ref.apply(this, arguments);
+        };
+      })();
+      cwd = (0, _path2.dirname)(path);
+      buffer = [];
+      out = function (f) {
+        return function () {
+          return buffer.push(f(...arguments));
+        };
+      };
+      Object.assign(sandbox, out, {
+        $: out,
+        include: function (path) {
+          return out(function () {
+            return subdocument(path, cwd);
           })();
         }
       });
-      run = function (js) {
-        return _vm2.default.runInContext(js, sandbox, {
-          filename: cwd,
-          displayErrors: true
-        });
-      };
-      replace = function (contents, f) {
-        return contents.replace(/::: coffee\s([^]*?)\s^:::/gm, function (...args) {
-          return f(args[1]);
-        });
-      };
-      process = function (contents) {
-        return replace(contents, function (cs) {
-          return buffered(function () {
-            return run(compile(cs));
-          });
-        });
-      };
-      return {
-        render: function (contents) {
-          return md(process(contents));
-        }
-      };
-    }
+      return subdocument(path);
+    };
+    return document;
   };
+  return context(_require);
 };
 
 exports.default = biscotti;

@@ -1,5 +1,3 @@
-::: coffee
+# Greetings!
 
-greeting = append (name) -> "Hello, #{name}!"
-
-:::
+:: greeting = $ (name) -> Promise.resolve "Hello, #{name}!" ::
