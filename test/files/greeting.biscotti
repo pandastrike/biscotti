@@ -1,0 +1,3 @@
+do $ -> "# Greetings!\n\n"
+
+greeting = $ (name) -> Promise.resolve "Hello, #{name}!\n\n"
