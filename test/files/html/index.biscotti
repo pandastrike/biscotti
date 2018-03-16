@@ -1,0 +1,8 @@
+import {HTML} from "panda-vdom"
+{render, html, body, h1} = HTML
+
+$$ render html [
+  body [
+    h1 "Hello, World!"
+  ]
+]

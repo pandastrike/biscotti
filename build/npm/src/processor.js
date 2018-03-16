@@ -69,7 +69,9 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
     };
   })();
   insertions = [];
-  evaluate = function ({ path, content }) {
+  evaluate = function (unit) {
+    var content, language, path;
+    ({ path, content, language } = unit);
     return sandbox.append(content.replace(pattern, function (_, content) {
       var buffer, placeholder;
       buffer = [];
@@ -83,11 +85,7 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
           return _ref2.apply(this, arguments);
         };
       })());
-      _sandbox2.default.run(sandbox, _unit2.default.create({
-        language: "coffeescript",
-        path,
-        content
-      }));
+      _sandbox2.default.run(sandbox, _unit2.default.create({ path, content, language }));
       mv(sandbox.buffer, buffer);
       return placeholder;
     }));
@@ -103,7 +101,11 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
     var _ref3 = _asyncToGenerator(function* ({ path, content }) {
       var i, insertion, len, result;
       if (content != null) {
-        evaluate({ path, content });
+        evaluate(_unit2.default.create({
+          language: "coffeescript",
+          path,
+          content
+        }));
       } else if (path != null) {
         sandbox.include(path);
       } else {

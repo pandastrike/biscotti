@@ -29,14 +29,14 @@ processor = ({globals = {require}, open = "::", close}) ->
 
   insertions = []
 
-  evaluate = ({path, content}) ->
+  evaluate = (unit) ->
+    {path, content, language} = unit
     sandbox.append content.replace pattern, (_, content) ->
       buffer = []
       placeholder = "#{open}#{insertions.length}#{close}"
       insertions.push (content) ->
         content.replace ///#{placeholder}///gm, await filter buffer
-      Sandbox.run sandbox,
-        Unit.create { language: "coffeescript", path, content }
+      Sandbox.run sandbox, Unit.create {path, content, language}
       mv sandbox.buffer, buffer
       placeholder
 
@@ -48,7 +48,7 @@ processor = ({globals = {require}, open = "::", close}) ->
 
   ({path, content}) ->
     if content?
-      evaluate {path, content}
+      evaluate Unit.create { language: "coffeescript", path, content }
     else if path?
       sandbox.include path
     else

@@ -47,3 +47,8 @@ do ->
 
     assert.equal (await render {content}),
       '# Greetings!\n\nHello, Bar!'
+
+do ->
+
+  render = renderer {require}
+  $p await render path: resolve "./test/files/html/index.biscotti"

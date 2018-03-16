@@ -75,3 +75,11 @@ global.$p = function () {
     }), '# Greetings!\n\nHello, Bar!');
   })();
 })();
+
+_asyncToGenerator(function* () {
+  var render;
+  render = (0, _renderer2.default)({ require });
+  return $p((yield render({
+    path: (0, _path.resolve)("./test/files/html/index.biscotti")
+  })));
+})();
