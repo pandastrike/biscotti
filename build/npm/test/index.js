@@ -50,6 +50,21 @@ global.$p = function () {
   })();
 })();
 
+_asyncToGenerator(function* () {
+  var _rec3 = new _powerAssertRecorder();
+
+  var render;
+  render = (0, _renderer2.default)({ require });
+  return _powerAssert2.default.equal("<html><body><h1>Hello, World!</h1></body></html>", _rec3._expr(_rec3._capt((yield render(_rec3._capt({
+    path: _rec3._capt((0, _path.resolve)("./test/files/html/index.biscotti"), "arguments/1/argument/arguments/0/properties/0/value")
+  }, "arguments/1/argument/arguments/0"))), "arguments/1"), {
+    content: "assert.equal(\"<html><body><h1>Hello, World!</h1></body></html>\", (await render({ path: resolve(\"./test/files/html/index.biscotti\") })))",
+    filepath: "index.coffee",
+    line: 33,
+    async: true
+  }));
+})();
+
 (function () {
   var content, path, render;
   // we need to do this because this path is relative to
@@ -58,28 +73,20 @@ global.$p = function () {
   content = "do $ -> \"# Greetings!\\n\\n\"\n\ndo $ -> \"Hello, Bar!\"";
   render = (0, _renderer2.default)({ require });
   return _asyncToGenerator(function* () {
-    var _rec3 = new _powerAssertRecorder(),
-        _rec4 = new _powerAssertRecorder();
+    var _rec4 = new _powerAssertRecorder(),
+        _rec5 = new _powerAssertRecorder();
 
-    _powerAssert2.default.equal(_rec3._expr(_rec3._capt((yield render(_rec3._capt({ path }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+    _powerAssert2.default.equal(_rec4._expr(_rec4._capt((yield render(_rec4._capt({ path }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
       content: "assert.equal((await render({ path })), '# Greetings!\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
       filepath: "index.coffee",
-      line: 45,
+      line: 52,
       async: true
     }), '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
-    return _powerAssert2.default.equal(_rec4._expr(_rec4._capt((yield render(_rec4._capt({ content }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+    return _powerAssert2.default.equal(_rec5._expr(_rec5._capt((yield render(_rec5._capt({ content }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
       content: "assert.equal((await render({ content })), '# Greetings!\\n\\nHello, Bar!')",
       filepath: "index.coffee",
-      line: 48,
+      line: 55,
       async: true
     }), '# Greetings!\n\nHello, Bar!');
   })();
-})();
-
-_asyncToGenerator(function* () {
-  var render;
-  render = (0, _renderer2.default)({ require });
-  return $p((yield render({
-    path: (0, _path.resolve)("./test/files/html/index.biscotti")
-  })));
 })();

@@ -8,8 +8,6 @@ processor = ({globals = {require}, open = "::", close}) ->
 
   close ?= open
 
-  pattern = ///#{open}\s*([^]*?)\s*#{close}///gm
-
   sandbox = Sandbox.create globals
 
   load = Loader.create
@@ -20,25 +18,36 @@ processor = ({globals = {require}, open = "::", close}) ->
         "#{path}/index.bpp"
       ]
 
-  mv = (a, b) -> (b.push do a.shift) while a.length > 0
-
-  filter = (buffer) ->
+  filter = (sandbox) ->
     result = ""
-    (result += await item) for item in buffer
+    while sandbox.buffer.length > 0
+      result += await do sandbox.buffer.shift
     result
 
   insertions = []
 
+  split = (delimiter) ->
+    (string) ->
+      if (index = string.indexOf delimiter) >= 0
+        before = string.substr 0, index
+        after = string.substr index + delimiter.length
+        [before, after]
+      else
+        undefined
+
+  open = split open
+  close = split close
+
   evaluate = (unit) ->
     {path, content, language} = unit
-    sandbox.append content.replace pattern, (_, content) ->
-      buffer = []
-      placeholder = "#{open}#{insertions.length}#{close}"
-      insertions.push (content) ->
-        content.replace ///#{placeholder}///gm, await filter buffer
-      Sandbox.run sandbox, Unit.create {path, content, language}
-      mv sandbox.buffer, buffer
-      placeholder
+    while (_ = (open content))?
+      [before, content] = _
+      sandbox.append before
+
+      if (_ = (close content))?
+        [block, content] = _
+        Sandbox.run sandbox, Unit.create {path, content: block, language}
+    sandbox.append content
 
   include = Include.mixin { cwd: process.cwd(), load, evaluate }
 
@@ -53,11 +62,6 @@ processor = ({globals = {require}, open = "::", close}) ->
       sandbox.include path
     else
       throw "biscotti: either path or content required"
-
-    result = do sandbox.buffer.shift
-    for insertion in insertions
-      result = await insertion result
-    result
-
+    filter sandbox
 
 export {processor as default}

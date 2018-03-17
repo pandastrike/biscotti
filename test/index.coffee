@@ -29,6 +29,12 @@ do ->
 
 do ->
 
+  render = renderer {require}
+  assert.equal "<html><body><h1>Hello, World!</h1></body></html>",
+    await render path: resolve "./test/files/html/index.biscotti"
+
+do ->
+
   # we need to do this because this path is relative to
   # file not where the tests may be run from ...
   path = resolve "./test/files/index.biscotti"
@@ -42,13 +48,9 @@ do ->
   render = renderer {require}
 
   do ->
+
     assert.equal (await render {path}),
       '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
 
     assert.equal (await render {content}),
       '# Greetings!\n\nHello, Bar!'
-
-do ->
-
-  render = renderer {require}
-  $p await render path: resolve "./test/files/html/index.biscotti"

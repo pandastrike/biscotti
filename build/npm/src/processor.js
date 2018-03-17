@@ -32,11 +32,10 @@ function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, a
 var processor;
 
 exports.default = processor = function ({ globals = { require }, open = "::", close }) {
-  var evaluate, filter, include, insertions, load, mv, pattern, sandbox;
+  var evaluate, filter, include, insertions, load, sandbox, split;
   if (close == null) {
     close = open;
   }
-  pattern = RegExp(`${open}\\s*([^]*?)\\s*${close}`, "gm");
   sandbox = _sandbox2.default.create(globals);
   load = _loader2.default.create({
     candidates: function (path) {
@@ -45,21 +44,12 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
       };
     }
   });
-  mv = function (a, b) {
-    var results;
-    results = [];
-    while (a.length > 0) {
-      results.push(b.push(a.shift()));
-    }
-    return results;
-  };
   filter = (() => {
-    var _ref = _asyncToGenerator(function* (buffer) {
-      var i, item, len, result;
+    var _ref = _asyncToGenerator(function* (sandbox) {
+      var result;
       result = "";
-      for (i = 0, len = buffer.length; i < len; i++) {
-        item = buffer[i];
-        result += yield item;
+      while (sandbox.buffer.length > 0) {
+        result += yield sandbox.buffer.shift();
       }
       return result;
     });
@@ -69,26 +59,36 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
     };
   })();
   insertions = [];
+  split = function (delimiter) {
+    return function (string) {
+      var after, before, index;
+      if ((index = string.indexOf(delimiter)) >= 0) {
+        before = string.substr(0, index);
+        after = string.substr(index + delimiter.length);
+        return [before, after];
+      } else {
+        return void 0;
+      }
+    };
+  };
+  open = split(open);
+  close = split(close);
   evaluate = function (unit) {
-    var content, language, path;
+    var _, before, block, content, language, path;
     ({ path, content, language } = unit);
-    return sandbox.append(content.replace(pattern, function (_, content) {
-      var buffer, placeholder;
-      buffer = [];
-      placeholder = `${open}${insertions.length}${close}`;
-      insertions.push((() => {
-        var _ref2 = _asyncToGenerator(function* (content) {
-          return content.replace(RegExp(`${placeholder}`, "gm"), (yield filter(buffer)));
-        });
-
-        return function (_x2) {
-          return _ref2.apply(this, arguments);
-        };
-      })());
-      _sandbox2.default.run(sandbox, _unit2.default.create({ path, content, language }));
-      mv(sandbox.buffer, buffer);
-      return placeholder;
-    }));
+    while ((_ = open(content)) != null) {
+      [before, content] = _;
+      sandbox.append(before);
+      if ((_ = close(content)) != null) {
+        [block, content] = _;
+        _sandbox2.default.run(sandbox, _unit2.default.create({
+          path,
+          content: block,
+          language
+        }));
+      }
+    }
+    return sandbox.append(content);
   };
   include = _include2.default.mixin({
     cwd: process.cwd(),
@@ -97,32 +97,20 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
   });
   include(sandbox);
   _buffer2.default.mixin(sandbox);
-  return (() => {
-    var _ref3 = _asyncToGenerator(function* ({ path, content }) {
-      var i, insertion, len, result;
-      if (content != null) {
-        evaluate(_unit2.default.create({
-          language: "coffeescript",
-          path,
-          content
-        }));
-      } else if (path != null) {
-        sandbox.include(path);
-      } else {
-        throw "biscotti: either path or content required";
-      }
-      result = sandbox.buffer.shift();
-      for (i = 0, len = insertions.length; i < len; i++) {
-        insertion = insertions[i];
-        result = yield insertion(result);
-      }
-      return result;
-    });
-
-    return function (_x3) {
-      return _ref3.apply(this, arguments);
-    };
-  })();
+  return function ({ path, content }) {
+    if (content != null) {
+      evaluate(_unit2.default.create({
+        language: "coffeescript",
+        path,
+        content
+      }));
+    } else if (path != null) {
+      sandbox.include(path);
+    } else {
+      throw "biscotti: either path or content required";
+    }
+    return filter(sandbox);
+  };
 };
 
 exports.default = processor;
