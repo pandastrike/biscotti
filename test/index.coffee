@@ -1,4 +1,5 @@
 global.$p = -> console.error arguments...
+$p.H = -> $
 import assert from "assert"
 import {resolve} from "path"
 import processor from "../src/processor"
@@ -19,13 +20,13 @@ do ->
 
   process = processor {require}
 
-  do ->
-    assert.equal (await process {path}),
-      '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
-
-    assert.equal (await process {content}),
-      '# Greetings!\n\nHello, Bar!'
-
+  # do ->
+  #   assert.equal (await process {path}),
+  #     '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
+  #
+  #   assert.equal (await process {content}),
+  #     '# Greetings!\n\nHello, Bar!'
+  #
 
 do ->
 

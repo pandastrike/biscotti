@@ -3,30 +3,30 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.include = undefined;
 
 var _path = require("path");
 
-var Include, create, mixin;
+var include;
 
-create = function ({ cwd, load, evaluate }) {
-  return function (path) {
-    var saved, unit;
-    unit = load(path[0] === "/" ? path : (0, _path.resolve)(cwd, path));
-    saved = cwd;
-    cwd = (0, _path.dirname)(unit.path);
-    evaluate(unit);
-    cwd = saved;
-    return unit;
+exports.include = include = function (cwd) {
+  return function (engine) {
+    var _include, run;
+    ({ run } = engine.sandbox);
+    _include = function (path) {
+      var result, saved;
+      if (cwd == null) {
+        cwd = engine.cwd;
+      }
+      path = path[0] === "/" ? path : (0, _path.resolve)(cwd, path);
+      saved = cwd;
+      cwd = (0, _path.dirname)(path);
+      result = run({ path });
+      cwd = saved;
+      return result;
+    };
+    return engine.sandbox.include = _include;
   };
-};
+}(void 0);
 
-mixin = function ({ cwd, load, evaluate }) {
-  return function (sandbox) {
-    return sandbox.include = create({ cwd, load, evaluate });
-  };
-};
-
-exports.default = Include = { create, mixin };
-
-exports.default = Include;
+exports.include = include;

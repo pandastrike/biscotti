@@ -1,18 +1,17 @@
 import {dirname, resolve as resolve} from "path"
 
-create = ({cwd, load, evaluate}) ->
-  (path) ->
-    unit = load (if path[0] == "/" then path else resolve cwd, path)
-    saved = cwd
-    cwd = dirname unit.path
-    evaluate unit
-    cwd = saved
-    unit
+include = do (cwd = undefined) ->
+  (engine) ->
+    {run} = engine.sandbox
+    _include = (path) ->
+      cwd ?= engine.cwd
+      path = if path[0] == "/" then path else resolve cwd, path
+      saved = cwd
+      cwd = dirname path
+      result = run {path}
+      cwd = saved
+      result
 
-mixin = ({cwd, load, evaluate}) ->
-  (sandbox) ->
-    sandbox.include = create {cwd, load, evaluate}
+    engine.sandbox.include = _include
 
-Include = {create, mixin}
-
-export {Include as default}
+export {include}

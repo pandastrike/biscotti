@@ -3,26 +3,35 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var Buffer, mixin;
+var buffer;
 
-mixin = function (sandbox) {
-  var append, buffer;
-  buffer = [];
+exports.buffer = buffer = function (engine) {
+  var _buffer, append, clear;
+  _buffer = [];
   append = function (value) {
-    return buffer.push(value);
+    return _buffer.push(value);
   };
-  return Object.assign(sandbox, {
-    buffer,
+  clear = function () {
+    return _buffer = [];
+  };
+  Object.assign(engine, {
+    buffer: _buffer,
     append,
+    clear
+  });
+  Object.assign(engine.sandbox, {
+    buffer: _buffer,
+    append,
+    // TODO: possibly make these part of a separate mixin?
     $: function (f) {
       return function () {
         return append(f(...arguments));
       };
     },
-    $$: append
+    $$: append,
+    clear
   });
+  return engine;
 };
 
-exports.default = Buffer = { mixin };
-
-exports.default = Buffer;
+exports.buffer = buffer;
