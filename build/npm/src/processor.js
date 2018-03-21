@@ -9,6 +9,8 @@ var _loader = require("./loader");
 
 var _buffer = require("./buffer");
 
+var _fallback = require("./fallback");
+
 var _include = require("./include");
 
 var _string = require("./filters/string");
@@ -25,10 +27,12 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
   return (0, _engine.engine)([{
     sandbox: (0, _sandbox.sandbox)(globals)
   }, (0, _loader.loader)({
-    coffeescript: {
+    biscotti: {
       index: true,
       extensions: [".bpp"]
     }
+  }), (0, _fallback.fallback)({
+    language: "biscotti"
   }), _include.include, _buffer.buffer, (0, _embedded.embedded)(open, close), _string.filter]);
 };
 

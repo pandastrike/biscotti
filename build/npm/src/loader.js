@@ -47,22 +47,24 @@ exports.loader = loader = function (description) {
   };
   load = function (unit) {
     var i, language, len, path, paths, ref;
-    if (unit.encoding == null) {
-      unit.encoding = "utf8";
-    }
-    ref = candidates(unit.path);
-    for (language in ref) {
-      paths = ref[language];
-      for (i = 0, len = paths.length; i < len; i++) {
-        path = paths[i];
-        try {
-          unit.content = trim(_fs2.default.readFileSync(path, unit.encoding));
-          unit[language] = unit.content;
-          return unit;
-        } catch (error) {}
+    if (unit.path != null) {
+      if (unit.encoding == null) {
+        unit.encoding = "utf8";
       }
+      ref = candidates(unit.path);
+      for (language in ref) {
+        paths = ref[language];
+        for (i = 0, len = paths.length; i < len; i++) {
+          path = paths[i];
+          try {
+            unit.content = trim(_fs2.default.readFileSync(path, unit.encoding));
+            unit[language] = unit.content;
+            return unit;
+          } catch (error) {}
+        }
+      }
+      throw `[${unit.path}] not found`;
     }
-    throw `biscotti: [${unit.path}] not found`;
   };
   return function (engine) {
     var run;

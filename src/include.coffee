@@ -8,7 +8,7 @@ include = do (cwd = undefined) ->
       path = if path[0] == "/" then path else resolve cwd, path
       saved = cwd
       cwd = dirname path
-      result = run {path}
+      result = run {path, include: true}
       cwd = saved
       result
 

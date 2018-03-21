@@ -21,7 +21,10 @@ exports.include = include = function (cwd) {
       path = path[0] === "/" ? path : (0, _path.resolve)(cwd, path);
       saved = cwd;
       cwd = (0, _path.dirname)(path);
-      result = run({ path });
+      result = run({
+        path,
+        include: true
+      });
       cwd = saved;
       return result;
     };

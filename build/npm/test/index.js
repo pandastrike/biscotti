@@ -34,23 +34,33 @@ $p.H = function () {
   // file not where the tests may be run from ...
   path = (0, _path.resolve)("./test/files/index.bpp");
   content = "# Greetings!\n\n:: do $ -> \"Hello, Bar!\" ::";
-  return process = (0, _processor2.default)({ require });
+  process = (0, _processor2.default)({ require });
+  return _asyncToGenerator(function* () {
+    var _rec = new _powerAssertRecorder(),
+        _rec2 = new _powerAssertRecorder();
+
+    _powerAssert2.default.equal(_rec._expr(_rec._capt((yield process(_rec._capt({ path }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+      content: "assert.equal((await process({ path })), '# Greetings!\\n\\n\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
+      filepath: "index.coffee",
+      line: 24,
+      async: true
+    }), '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
+    return _powerAssert2.default.equal(_rec2._expr(_rec2._capt((yield process(_rec2._capt({ content }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+      content: "assert.equal((await process({ content })), '# Greetings!\\n\\nHello, Bar!')",
+      filepath: "index.coffee",
+      line: 27,
+      async: true
+    }), '# Greetings!\n\nHello, Bar!');
+  })();
 })();
 
 _asyncToGenerator(function* () {
-  var _rec = new _powerAssertRecorder();
-
-  // do ->
-  //   assert.equal (await process {path}),
-  //     '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
-
-  //   assert.equal (await process {content}),
-  //     '# Greetings!\n\nHello, Bar!'
+  var _rec3 = new _powerAssertRecorder();
 
   var render;
   render = (0, _renderer2.default)({ require });
-  return _powerAssert2.default.equal("<html><body><h1>Hello, World!</h1></body></html>", _rec._expr(_rec._capt((yield render(_rec._capt({
-    path: _rec._capt((0, _path.resolve)("./test/files/html/index.biscotti"), "arguments/1/argument/arguments/0/properties/0/value")
+  return _powerAssert2.default.equal("<html><body><h1>Hello, World!</h1></body></html>", _rec3._expr(_rec3._capt((yield render(_rec3._capt({
+    path: _rec3._capt((0, _path.resolve)("./test/files/html/index.biscotti"), "arguments/1/argument/arguments/0/properties/0/value")
   }, "arguments/1/argument/arguments/0"))), "arguments/1"), {
     content: "assert.equal(\"<html><body><h1>Hello, World!</h1></body></html>\", (await render({ path: resolve(\"./test/files/html/index.biscotti\") })))",
     filepath: "index.coffee",
@@ -67,16 +77,16 @@ _asyncToGenerator(function* () {
   content = "do $ -> \"# Greetings!\\n\\n\"\n\ndo $ -> \"Hello, Bar!\"";
   render = (0, _renderer2.default)({ require });
   return _asyncToGenerator(function* () {
-    var _rec2 = new _powerAssertRecorder(),
-        _rec3 = new _powerAssertRecorder();
+    var _rec4 = new _powerAssertRecorder(),
+        _rec5 = new _powerAssertRecorder();
 
-    _powerAssert2.default.equal(_rec2._expr(_rec2._capt((yield render(_rec2._capt({ path }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+    _powerAssert2.default.equal(_rec4._expr(_rec4._capt((yield render(_rec4._capt({ path }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
       content: "assert.equal((await render({ path })), '# Greetings!\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
       filepath: "index.coffee",
       line: 53,
       async: true
     }), '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
-    return _powerAssert2.default.equal(_rec3._expr(_rec3._capt((yield render(_rec3._capt({ content }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
+    return _powerAssert2.default.equal(_rec5._expr(_rec5._capt((yield render(_rec5._capt({ content }, "arguments/0/argument/arguments/0"))), "arguments/0"), {
       content: "assert.equal((await render({ content })), '# Greetings!\\n\\nHello, Bar!')",
       filepath: "index.coffee",
       line: 56,

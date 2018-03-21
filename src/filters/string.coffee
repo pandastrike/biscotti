@@ -5,7 +5,8 @@ import {Method} from "fairmont-multimethods"
 # This is a hack, where we use a flag on the argument
 # to ensure we don't hit an infinite loop
 
-isNotFiltered = (unit) -> unit.javascript? && !unit.filter?
+isNotFiltered = (unit) ->
+  !unit.include? && unit.javascript? && !unit.filter?
 
 filter = (engine) ->
   {buffer, clear, sandbox} = engine
@@ -16,8 +17,8 @@ filter = (engine) ->
       result = ""
       while buffer.length > 0
         result += await do buffer.shift
-      $p {result}
       result
+
     run unit
     do unit.filter
 

@@ -7,6 +7,8 @@ exports.default = undefined;
 
 var _loader = require("./loader");
 
+var _fallback = require("./fallback");
+
 var _buffer = require("./buffer");
 
 var _include = require("./include");
@@ -27,7 +29,7 @@ exports.default = renderer = function ({ globals = { require } }) {
       index: true,
       extensions: [".biscotti"]
     }
-  }), _include.include, _buffer.buffer, _string.filter]);
+  }), (0, _fallback.fallback)(), _include.include, _buffer.buffer, _string.filter]);
 };
 
 exports.default = renderer;

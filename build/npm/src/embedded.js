@@ -26,7 +26,7 @@ split = function (delimiter) {
 
 // TODO: should this be configurable?
 isBiscotti = function (unit) {
-  return unit.biscotti != null;
+  return unit.biscotti != null & unit.coffeescript == null;
 };
 
 exports.embedded = embedded = function (open, close) {
@@ -40,21 +40,21 @@ exports.embedded = embedded = function (open, close) {
     ({ sandbox, append } = engine);
     ({ run } = sandbox);
     return define(run, isBiscotti, function (unit) {
-      var _, before, block, content, language, path;
+      var _, before, block, code, content, language, path;
       ({ path, content, language } = unit);
+      code = [];
       while ((_ = open(content)) != null) {
         [before, content] = _;
-        append(before);
+        code.push("append" + JSON.stringify(before));
         if ((_ = close(content)) != null) {
           [block, content] = _;
-          sandbox.run({
-            path,
-            content: block,
-            language
-          });
+          code.push(block.trim());
+          code.push(JSON.stringify(content));
         }
       }
-      return sandbox.append(content);
+      code.push(JSON.stringify(content));
+      unit.coffeescript = code.join("\n");
+      return run(unit);
     });
   };
 };

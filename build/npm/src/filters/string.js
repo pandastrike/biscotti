@@ -17,7 +17,7 @@ var define, filter, isNotFiltered;
 // This is a hack, where we use a flag on the argument
 // to ensure we don't hit an infinite loop
 isNotFiltered = function (unit) {
-  return unit.javascript != null && unit.filter == null;
+  return unit.include == null && unit.javascript != null && unit.filter == null;
 };
 
 exports.filter = filter = function (engine) {
@@ -31,7 +31,6 @@ exports.filter = filter = function (engine) {
       while (buffer.length > 0) {
         result += yield buffer.shift();
       }
-      $p({ result });
       return result;
     });
     run(unit);

@@ -20,14 +20,15 @@ loader = (description) ->
     result
 
   load = (unit) ->
-    unit.encoding ?= "utf8"
-    for language, paths of candidates unit.path
-      for path in paths
-        try
-          unit.content = trim fs.readFileSync path, unit.encoding
-          unit[language] = unit.content
-          return unit
-    throw "biscotti: [#{unit.path}] not found"
+    if unit.path?
+      unit.encoding ?= "utf8"
+      for language, paths of candidates unit.path
+        for path in paths
+          try
+            unit.content = trim fs.readFileSync path, unit.encoding
+            unit[language] = unit.content
+            return unit
+      throw "[#{unit.path}] not found"
 
   (engine) ->
 
