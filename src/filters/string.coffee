@@ -6,6 +6,7 @@ import {Method} from "fairmont-multimethods"
 # to ensure we don't hit an infinite loop
 
 isNotFiltered = (unit) ->
+  # TODO: biscotti files don't have javascript defined!
   !unit.include? && unit.javascript? && !unit.filter?
 
 filter = (engine) ->
