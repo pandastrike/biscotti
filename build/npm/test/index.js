@@ -24,6 +24,10 @@ var _pandaVdom = require("panda-vdom");
 
 var _amen = require("amen");
 
+var _vcss = require("../src/vcss");
+
+var _vcss2 = _interopRequireDefault(_vcss);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -50,7 +54,7 @@ _asyncToGenerator(function* () {
       return _powerAssert2.default.equal(_rec._expr(_rec._capt(result, "arguments/0"), {
         content: "assert.equal(result, '# Greetings!\\n\\n\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
         filepath: "index.coffee",
-        line: 27,
+        line: 28,
         async: true
       }), '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
     })), (0, _amen.test)("from string", _asyncToGenerator(function* () {
@@ -63,7 +67,7 @@ _asyncToGenerator(function* () {
       return _powerAssert2.default.equal(_rec2._expr(_rec2._capt(result, "arguments/0"), {
         content: "assert.equal(result, '# Greetings!\\n\\nHello, Bar!')",
         filepath: "index.coffee",
-        line: 40,
+        line: 41,
         async: true
       }), '# Greetings!\n\nHello, Bar!');
     }))];
@@ -80,7 +84,7 @@ _asyncToGenerator(function* () {
       return _powerAssert2.default.equal(_rec3._expr(_rec3._capt(result, "arguments/0"), {
         content: "assert.equal(result, '# Greetings!\\n\\nThis is a test.\\n\\nHello, Foo!\\n\\nGoodbye, now!')",
         filepath: "index.coffee",
-        line: 55,
+        line: 56,
         async: true
       }), '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!');
     })), (0, _amen.test)("from path (with import)", _asyncToGenerator(function* () {
@@ -94,7 +98,7 @@ _asyncToGenerator(function* () {
       return _powerAssert2.default.equal(_rec4._expr(_rec4._capt(result, "arguments/0"), {
         content: "assert.equal(result, \"<html><body><h1>Hello, World!</h1></body></html>\")",
         filepath: "index.coffee",
-        line: 62,
+        line: 63,
         async: true
       }), "<html><body><h1>Hello, World!</h1></body></html>");
     })), (0, _amen.test)("from content", _asyncToGenerator(function* () {
@@ -107,7 +111,7 @@ _asyncToGenerator(function* () {
       return _powerAssert2.default.equal(_rec5._expr(_rec5._capt(result, "arguments/0"), {
         content: "assert.equal(result, '# Greetings!\\n\\nHello, Bar!')",
         filepath: "index.coffee",
-        line: 74,
+        line: 75,
         async: true
       }), '# Greetings!\n\nHello, Bar!');
     }))];
@@ -122,15 +126,22 @@ _asyncToGenerator(function* () {
     _powerAssert2.default.equal(_rec6._expr(_rec6._capt(_rec6._capt(documents, "arguments/0/object").length, "arguments/0"), {
       content: "assert.equal(documents.length, 1)",
       filepath: "index.coffee",
-      line: 82,
+      line: 83,
       async: true
     }), 1);
     result = _pandaVdom.HTML.render(documents[0]);
     return _powerAssert2.default.equal(_rec7._expr(_rec7._capt(result, "arguments/0"), {
       content: "assert.equal(result, \"<html><body><h1>Hello, World!</h1></body></html>\")",
       filepath: "index.coffee",
-      line: 84,
+      line: 85,
       async: true
     }), "<html><body><h1>Hello, World!</h1></body></html>");
+  })), (0, _amen.test)("VCSS", _asyncToGenerator(function* () {
+    var result, sheets;
+    sheets = yield (0, _vcss2.default)({
+      path: (0, _path.resolve)("./test/files/vcss/index.vcss")
+    });
+    result = sheets[0]({});
+    return $p(JSON.stringify(result, null, 2));
   }))])));
 })();

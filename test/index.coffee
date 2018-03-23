@@ -7,6 +7,7 @@ import renderer from "../src/renderer"
 import vdom from "../src/vdom"
 import {HTML} from "panda-vdom"
 import {print, test} from "amen"
+import vcss from "../src/vcss"
 
 
 do ->
@@ -84,4 +85,9 @@ do ->
       assert.equal result,
         "<html><body><h1>Hello, World!</h1></body></html>",
 
-  ]
+    test "VCSS", ->
+      sheets = await vcss path: resolve "./test/files/vcss/index.vcss"
+      result = sheets[0] {}
+      $p JSON.stringify result, null, 2
+
+]

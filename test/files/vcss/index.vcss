@@ -1,0 +1,8 @@
+rhythm = (lineHeight, fontSize) -> [
+  p "font-size", scale lineHeight, fontSize
+  p "line-height", lineHeight
+]
+
+$$ s "article > h1", [
+  rhythm (rem 4), (pct 90)
+]
