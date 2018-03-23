@@ -33,7 +33,7 @@ exports.default = processor = function ({ globals = { require }, open = "::", cl
     }
   }), (0, _fallback.fallback)({
     language: "biscotti"
-  }), _include.include, _buffer.buffer, (0, _embedded.embedded)(open, close), _string.filter]);
+  }), (0, _include.include)(), _buffer.buffer, (0, _embedded.embedded)(open, close), _string.filter]);
 };
 
 exports.default = processor;

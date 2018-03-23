@@ -16,7 +16,7 @@ processor = ({globals = {require}, open = "::", close}) ->
         index: true
         extensions: [ ".bpp" ]
     fallback language: "biscotti"
-    include
+    do include
     buffer
     embedded open, close
     filter

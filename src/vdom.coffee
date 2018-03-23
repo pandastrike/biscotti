@@ -2,22 +2,25 @@ import {loader} from "./loader"
 import {fallback} from "./fallback"
 import {buffer} from "./buffer"
 import {include} from "./include"
-import {filter} from "./filters/string"
+import {filter} from "./filters/vdom"
 import {sandbox} from "./sandbox"
 import {engine} from "./engine"
+import {HTML} from "panda-vdom"
 
-renderer = ({globals = {require}}) ->
+vdom = do ->
+
+  globals = Object.assign {}, {require}, HTML
 
   engine [
     sandbox: sandbox globals
     loader
       coffeescript:
         index: true
-        extensions: [ ".biscotti" ]
+        extensions: [ ".vdom" ]
     do fallback
-    do include
+    include isBuffered: false
     buffer
     filter
   ]
 
-export {renderer as default}
+export {vdom as default}

@@ -1,0 +1,8 @@
+$$ html [
+
+  # TODO: In order for this to work, we need buffer stacks
+  # or a non-buffering mechanism to return a value
+
+  body include "hello-world.vdom"
+
+]

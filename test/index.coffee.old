@@ -1,0 +1,63 @@
+global.$p = -> console.error arguments...
+$p.H = -> $
+import assert from "assert"
+import {resolve} from "path"
+import processor from "../src/processor"
+import renderer from "../src/renderer"
+
+
+do ->
+
+  # we need to do this because this path is relative to
+  # file not where the tests may be run from ...
+  path = resolve "./test/files/index.bpp"
+
+  content = """
+    # Greetings!
+
+    :: do $ -> "Hello, Bar!" ::
+    """
+
+  process = processor {require}
+
+  do ->
+    result = await process {path}
+    assert.equal result,
+      '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
+
+    result = await process {content}
+    assert.equal result,
+      '# Greetings!\n\nHello, Bar!'
+
+
+do ->
+
+  render = renderer {require}
+  result = await render path: resolve "./test/files/html/index.biscotti"
+  assert.equal result,
+    "<html><body><h1>Hello, World!</h1></body></html>",
+
+
+do ->
+
+  # we need to do this because this path is relative to
+  # file not where the tests may be run from ...
+  path = resolve "./test/files/index.biscotti"
+
+  content = """
+    do $ -> "# Greetings!\\n\\n"
+
+    do $ -> "Hello, Bar!"
+    """
+
+  render = renderer {require}
+
+  do ->
+
+    result = await render {path}
+    assert.equal result,
+      '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
+
+    result = await render {content}
+    assert.equal result,
+      '# Greetings!\n\nHello, Bar!'

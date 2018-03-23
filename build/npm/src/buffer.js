@@ -6,21 +6,23 @@ Object.defineProperty(exports, "__esModule", {
 var buffer;
 
 exports.buffer = buffer = function (engine) {
-  var _buffer, append, clear;
+  var _buffer, append, clear, get, restore;
   _buffer = [];
+  get = function () {
+    return _buffer;
+  };
   append = function (value) {
     return _buffer.push(value);
   };
   clear = function () {
     return _buffer = [];
   };
-  Object.assign(engine, {
-    buffer: _buffer,
-    append,
-    clear
-  });
+  restore = function (buffer) {
+    return _buffer = buffer;
+  };
+  Object.assign(engine, { get, append, clear, restore });
   Object.assign(engine.sandbox, {
-    buffer: _buffer,
+    get,
     append,
     // TODO: possibly make these part of a separate mixin?
     $: function (f) {
@@ -29,7 +31,8 @@ exports.buffer = buffer = function (engine) {
       };
     },
     $$: append,
-    clear
+    clear,
+    restore
   });
   return engine;
 };

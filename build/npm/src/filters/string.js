@@ -17,20 +17,25 @@ var define, filter, isNotFiltered;
 // This is a hack, where we use a flag on the argument
 // to ensure we don't hit an infinite loop
 isNotFiltered = function (unit) {
-  return unit.include == null && unit.javascript != null && unit.filter == null;
+  // TODO: biscotti files don't have javascript defined!
+  return unit.javascript != null && unit.filter == null;
 };
 
 exports.filter = filter = function (engine) {
-  var buffer, clear, run, sandbox;
-  ({ buffer, clear, sandbox } = engine);
+  var append, clear, get, run, sandbox;
+  ({ append, get, clear, sandbox } = engine);
   ({ run } = sandbox);
   return define(run, isNotFiltered, function (unit) {
+    var buffer;
+    buffer = get();
     unit.filter = _asyncToGenerator(function* () {
-      var result;
+      var i, item, len, result;
       result = "";
-      while (buffer.length > 0) {
-        result += yield buffer.shift();
+      for (i = 0, len = buffer.length; i < len; i++) {
+        item = buffer[i];
+        result += yield item;
       }
+      clear();
       return result;
     });
     run(unit);

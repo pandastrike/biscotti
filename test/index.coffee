@@ -4,54 +4,84 @@ import assert from "assert"
 import {resolve} from "path"
 import processor from "../src/processor"
 import renderer from "../src/renderer"
+import vdom from "../src/vdom"
+import {HTML} from "panda-vdom"
+import {print, test} from "amen"
 
 
 do ->
 
-  # we need to do this because this path is relative to
-  # file not where the tests may be run from ...
-  path = resolve "./test/files/index.bpp"
+  print await test "Biscotti", [
 
-  content = """
-    # Greetings!
+    test "Pre-processor engine", do ->
 
-    :: do $ -> "Hello, Bar!" ::
-    """
+      [
 
-  process = processor {require}
+        test "from path", ->
+          process = processor {require}
 
-  do ->
-    assert.equal (await process {path}),
-      '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
+          # we need to do this because this path is relative to
+          # file not where the tests may be run from ...
+          path = resolve "./test/files/index.bpp"
+          result = await process {path}
+          assert.equal result,
+            '# Greetings!\n\n\n\nThis is a test.\n\n\
+              Hello, Foo!\n\nGoodbye, now!'
 
-    assert.equal (await process {content}),
-      '# Greetings!\n\nHello, Bar!'
+        test "from string", ->
+          process = processor {require}
 
+          content = """
+            # Greetings!
 
-do ->
+            :: do $ -> "Hello, Bar!" ::
+            """
+          result = await process {content}
+          assert.equal result,
+            '# Greetings!\n\nHello, Bar!'
+      ]
 
-  render = renderer {require}
-  assert.equal "<html><body><h1>Hello, World!</h1></body></html>",
-    await render path: resolve "./test/files/html/index.biscotti"
+    test "Rendering engine", do ->
 
-do ->
+      [
 
-  # we need to do this because this path is relative to
-  # file not where the tests may be run from ...
-  path = resolve "./test/files/index.biscotti"
+        test "from path", ->
+          render = renderer {require}
 
-  content = """
-    do $ -> "# Greetings!\\n\\n"
+          # we need to do this because this path is relative to
+          # file not where the tests may be run from ...
+          path = resolve "./test/files/index.biscotti"
+          result = await render {path}
+          assert.equal result,
+            '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
 
-    do $ -> "Hello, Bar!"
-    """
+        test "from path (with import)", ->
+          render = renderer {require}
 
-  render = renderer {require}
+          result = await render path: resolve "./test/files/html/index.biscotti"
+          assert.equal result,
+            "<html><body><h1>Hello, World!</h1></body></html>"
 
-  do ->
+        test "from content", ->
+          render = renderer {require}
 
-    assert.equal (await render {path}),
-      '# Greetings!\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
+          content = """
+            do $ -> "# Greetings!\\n\\n"
 
-    assert.equal (await render {content}),
-      '# Greetings!\n\nHello, Bar!'
+            do $ -> "Hello, Bar!"
+            """
+          result = await render {content}
+          assert.equal result,
+            '# Greetings!\n\nHello, Bar!'
+
+      ]
+
+    test "VDOM", ->
+
+      documents = await vdom path: resolve "./test/files/vdom/index.vdom"
+      assert.equal documents.length, 1
+      result = HTML.render documents[0]
+      assert.equal result,
+        "<html><body><h1>Hello, World!</h1></body></html>",
+
+  ]

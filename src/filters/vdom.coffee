@@ -10,18 +10,14 @@ isNotFiltered = (unit) ->
   unit.javascript? && !unit.filter?
 
 filter = (engine) ->
-  {append, get, clear, sandbox} = engine
+  {get, clear, sandbox} = engine
   {run} = sandbox
 
   define run, isNotFiltered, (unit) ->
-    buffer = do get
     unit.filter = ->
-      result = ""
-      for item in buffer
-        result += await item
+      result = Array.from do get
       do clear
       result
-
     run unit
     do unit.filter
 

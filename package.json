@@ -10,6 +10,7 @@
     "fairmont-multimethods": "^2.0.2"
   },
   "devDependencies": {
+    "amen": "^2.0.5",
     "gulp": "github:gulpjs/gulp#4.0",
     "panda-builder": "^1.1.1",
     "panda-vdom": "^1.0.0",
