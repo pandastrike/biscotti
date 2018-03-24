@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = undefined;
+exports.CSS = exports.vcss = undefined;
 
 var _loader = require("./loader");
 
@@ -19,53 +19,162 @@ var _sandbox = require("./sandbox");
 
 var _engine = require("./engine");
 
-var CSS, mix, unit, vcss;
+var _fairmontMultimethods = require("fairmont-multimethods");
 
-mix = function (mixins, target) {
+var _fairmontHelpers = require("fairmont-helpers");
+
+var CSS, Properties, Styles, Units, Value, isArray, isDefined, isEmpty, isFunction, isObject, mix, render, units, vcss;
+
+// TODO: Fairmont isEmpty should use isKind for objects?
+isEmpty = function (x) {
+  return Object.keys(x).length === 0;
+};
+
+Styles = class Styles {
+  static create() {
+    return new Styles();
+  }
+
+};
+
+Properties = class Properties {
+  static create() {
+    return new Properties();
+  }
+
+};
+
+Value = class Value {};
+
+Units = class Units extends Value {
+  static create() {
+    return new Units(...arguments);
+  }
+
+  constructor({
+    name: name1,
+    value: value1
+  }) {
+    super();
+    this.name = name1;
+    this.value = value1;
+  }
+
+};
+
+units = function (name, value) {
+  return Units.create({ name, value });
+};
+
+// TODO: I need to use duck-typing here
+// because VM literals have different
+// prototypes/constructors that those
+// in closures from outside the VM
+isDefined = function (x) {
+  return x !== void 0;
+};
+
+isFunction = function (x) {
+  return x.call != null;
+};
+
+isArray = function (x) {
+  return x.forEach != null;
+};
+
+isObject = function (x) {
+  return x.constructor.assign != null;
+};
+
+mix = _fairmontMultimethods.Method.create();
+
+_fairmontMultimethods.Method.define(mix, isFunction, isObject, function (mixin, target) {
+  return mixin(target);
+});
+
+_fairmontMultimethods.Method.define(mix, isArray, isObject, function (mixins, target) {
   var i, len, mixin, results;
   results = [];
   for (i = 0, len = mixins.length; i < len; i++) {
     mixin = mixins[i];
-    if (mixin.call != null) {
-      results.push(mixin(target));
-    } else if (mixin.slice != null) {
-      results.push(mix(mixin, target));
-    } else {
-      results.push(void 0);
-    }
+    results.push(mix(mixin, target));
   }
   return results;
-};
+});
 
-CSS = {
-  s: function (selector, mixins) {
-    return function (styles) {
-      mix(mixins, styles[selector] != null ? styles[selector] : styles[selector] = {});
+render = _fairmontMultimethods.Method.create();
+
+_fairmontMultimethods.Method.define(render, isDefined, function (value) {
+  return `${value}`;
+});
+
+_fairmontMultimethods.Method.define(render, (0, _fairmontHelpers.isType)(Styles), function (styles) {
+  var properties, selector;
+  return function () {
+    var results;
+    results = [];
+    for (selector in styles) {
+      properties = styles[selector];
+      if (!isEmpty(properties)) {
+        results.push(`${selector} { ${render(properties)} }`);
+      }
+    }
+    return results;
+  }().join("\n");
+});
+
+_fairmontMultimethods.Method.define(render, (0, _fairmontHelpers.isType)(Properties), function (properties) {
+  var name, value;
+  return function () {
+    var results;
+    results = [];
+    for (name in properties) {
+      value = properties[name];
+      results.push(`${name}: ${render(value)};`);
+    }
+    return results;
+  }().join(" ");
+});
+
+_fairmontMultimethods.Method.define(render, (0, _fairmontHelpers.isType)(Units), function ({ name, value }) {
+  return `${value}${name}`;
+});
+
+exports.CSS = CSS = {
+  render: render,
+  s: function (_selector, mixins) {
+    return function (target = {}) {
+      var selector, style, styles;
+      styles = target.styles != null ? target.styles : target.styles = Styles.create();
+      if (target.selector == null) {
+        target.selector = "";
+      }
+      selector = _selector.replace(/\&/, target.selector);
+      style = styles[selector] != null ? styles[selector] : styles[selector] = Properties.create();
+      mix(mixins, { styles, style, selector });
       return styles;
     };
   },
   p: function (name, value) {
-    return function (style) {
+    return function ({ style }) {
       style[name] = value;
       return style;
     };
   },
-  unit: unit = function (name, value) {
-    return { name, value };
-  },
+  units: units,
   rem: function (number) {
-    return unit("rem", 4);
+    return units("rem", number);
   },
   pct: function (number) {
     return number / 100;
   },
   scale: function ({ name, value }, factor) {
     value *= factor;
-    return { name, value };
+    return units(name, value);
   }
 };
 
-exports.default = vcss = function () {
+exports.vcss = vcss = function () {
   var globals;
   globals = Object.assign({}, { require }, CSS);
   return (0, _engine.engine)([{
@@ -80,4 +189,5 @@ exports.default = vcss = function () {
   }), _buffer.buffer, _vcss.filter]);
 }();
 
-exports.default = vcss;
+exports.vcss = vcss;
+exports.CSS = CSS;

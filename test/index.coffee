@@ -7,7 +7,7 @@ import renderer from "../src/renderer"
 import vdom from "../src/vdom"
 import {HTML} from "panda-vdom"
 import {print, test} from "amen"
-import vcss from "../src/vcss"
+import {vcss, CSS} from "../src/vcss"
 
 
 do ->
@@ -87,7 +87,9 @@ do ->
 
     test "VCSS", ->
       sheets = await vcss path: resolve "./test/files/vcss/index.vcss"
-      result = sheets[0] {}
-      $p JSON.stringify result, null, 2
-
+      result = CSS.render do sheets[0]
+      assert result, """
+        article > h1 { font-size: 3.6rem; line-height: 4rem; }
+        article > p { font-face: Montserrat; }
+       """
 ]

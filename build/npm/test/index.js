@@ -26,8 +26,6 @@ var _amen = require("amen");
 
 var _vcss = require("../src/vcss");
 
-var _vcss2 = _interopRequireDefault(_vcss);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
@@ -137,11 +135,18 @@ _asyncToGenerator(function* () {
       async: true
     }), "<html><body><h1>Hello, World!</h1></body></html>");
   })), (0, _amen.test)("VCSS", _asyncToGenerator(function* () {
+    var _rec8 = new _powerAssertRecorder();
+
     var result, sheets;
-    sheets = yield (0, _vcss2.default)({
+    sheets = yield (0, _vcss.vcss)({
       path: (0, _path.resolve)("./test/files/vcss/index.vcss")
     });
-    result = sheets[0]({});
-    return $p(JSON.stringify(result, null, 2));
+    result = _vcss.CSS.render(sheets[0]());
+    return (0, _powerAssert2.default)(_rec8._expr(_rec8._capt(result, "arguments/0"), {
+      content: "assert(result, \"article > h1 { font-size: 3.6rem; line-height: 4rem; }\\narticle > p { font-face: Montserrat; }\")",
+      filepath: "index.coffee",
+      line: 91,
+      async: true
+    }), "article > h1 { font-size: 3.6rem; line-height: 4rem; }\narticle > p { font-face: Montserrat; }");
   }))])));
 })();
