@@ -1,9 +1,0 @@
-$$ [
-  s "& > h1", [
-    rhythm (rem 4), (pct 90)
-  ]
-
-  s "& > p", [
-    p "font-face", "Montserrat"
-  ]
-]

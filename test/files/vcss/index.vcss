@@ -1,6 +1,0 @@
-rhythm = (lineHeight, fontSize) -> [
-  p "font-size", scale lineHeight, fontSize
-  p "line-height", lineHeight
-]
-
-$$ s "article", include "./article.vcss"

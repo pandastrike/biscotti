@@ -8,7 +8,8 @@
     "babel-preset-env": "^1.6.1",
     "coffeescript": "^2.2.2",
     "fairmont-helpers": "^3.3.2",
-    "fairmont-multimethods": "^2.0.2"
+    "fairmont-multimethods": "^2.0.2",
+    "panda-vcss": "^1.0.0"
   },
   "devDependencies": {
     "amen": "^2.0.5",
