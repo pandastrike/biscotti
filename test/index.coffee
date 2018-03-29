@@ -1,22 +1,43 @@
-import assert from "assert"
 import {resolve} from "path"
-import biscotti from "../src/index"
+import assert from "assert"
+import {print, test} from "amen"
+import {loader, fallback, buffer, include,
+  filters, sandbox, engine} from "../src"
 
-# we need to do this because this path is relative to
-# file not where the tests may be run from ...
-path = resolve "./test/files/index.bisc"
+verify = ({before, actual, expected}) ->
+  -> assert.equal expected, await actual do before
 
-text = """
-  # Greetings!
-
-  :: do $ -> "Hello, Bar!" ::
-  """
-
-process = biscotti {require}
+before = ->
+  engine [
+    sandbox: sandbox {require}
+    loader
+      coffeescript:
+        index: true
+        extensions: [ ".biscotti" ]
+    do fallback
+    do include
+    buffer
+    filters.string
+  ]
 
 do ->
-  assert.equal (await process path),
-    '# Greetings!\n\n\n\nThis is a test.\n\nHello, Foo!\n\nGoodbye, now!'
 
-  assert.equal (await process path, {text}),
-    '# Greetings!\n\nHello, Bar!'
+  print await test "biscotti", [
+
+    test "from path", verify
+      before: before
+      actual: (render) -> render path: resolve "./test/files/index.biscotti"
+      expected: '# Greetings!\n\nThis is a test.\n\n\
+        Hello, Foo!\n\nGoodbye, now!'
+
+    test "from content", verify
+      before: before
+      actual: (render) -> render
+        content: """
+          do $ -> "# Greetings!\\n\\n"
+
+          do $ -> "Hello, Bar!"
+          """
+      expected: '# Greetings!\n\nHello, Bar!'
+
+]

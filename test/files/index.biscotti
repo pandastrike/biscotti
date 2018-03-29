@@ -1,17 +1,9 @@
-::
-
 import {Method} from "fairmont-multimethods"
 
 include "greeting"
 
-::
-
-This is a test.
-
-::
+do $ -> "This is a test.\n\n"
 
 greeting "Foo"
 
-do $ -> "\n\nGoodbye, now!"
-
-::
+do $ -> "Goodbye, now!"

@@ -1,113 +1,67 @@
 # Biscotti
 
-_Like M4, but in CoffeeScript._
+Like Legos for building domain-specific languages (DSLs).
 
-Put CoffeeScript in your Markdown or YAML…or anywhere else! This is probably a thing you have never thought of doing or have always dreamt of doing, depending on your tolerance for madness.
+For example, suppose we want an HTML DSL. We can implement one that uses CoffeeScript and VDOM like this:
 
-If you're familiar with [M4](https://www.gnu.org/software/m4/manual/m4.html), just imagine that, but with CoffeeScript, complete with full the latest EcmaScript goodies, including Promises and `import`.
+```coffee
+import {loader, fallback, buffer, include,
+  filters, sandbox, engine} from "biscotti"
+import {HTML} from "panda-vdom"
 
-If you're not familiar with M4, or your only familiarity with it is because `make config` didn't work, imagine a templating language like Handlebars, except that it laughs in face of phrases like “logicless templates.”
+render = do ->
 
-Suppose we're writing in Markdown, and we get tired of writing the Markdown for greetings. (I know, implausible, but just go with it.) We can define a simple `greeting` function we can use anywhere in our document.
+  globals = Object.assign {}, {require}, HTML
 
-```markdown
-# Biscotti
+  engine [
+    sandbox: sandbox globals
+    loader
+      coffeescript:
+        index: true
+        extensions: [ ".vhtml" ]
+    do fallback
+    include isBuffered: false
+    buffer
+    filters.string
+  ]
 
-_Like M4, but in CoffeeScript._
-
-:: greeting = $ (name) -> "Hello, #{name}!" ::
-
+export {render as default}
 ```
 
-That little `$` is a “built-in” that takes the result of the function and includes it in the output that will replace our code block. (If for some reason, you wanted to load JQuery, `$` is an alias for `out`.)
+You could then call the resulting `render` function:
 
-Suppose we want to welcome our friend Foo. (Like I said, just go with it.) We can just invoke our function.
-
-```
-:: greeting "Foo" ::
-```
-
-> # Biscotti
->
-> _Embed executable CoffeeScript in your Markdown._
->
->
-> Hello, Foo!
-
-How about we break out Markdown file into more manageable pieces?
-
-```markdown
-# A Dark And Stormy Night
-
-_by Snoopy_
-
-::
-
-include "chapter-1"
-include "chapter-2"
-include "chapter-3"
-# you get the idea...
-
-::
-
+```coffee
+# will load ./html/index.vhtml
+render path: "./vhtml"
 ```
 
-And, yup, `include` is another built-in.
+You _probably_ don't want to use this directly. Instead, check out the various engines we've written that use Biscotti:
 
-You can also use `import` to reuse code from other modules. You just need to pass in an implementation of `require` to a Biscotti instance's `context` method.
-
-```markdown
-
-:: import {chapter} from "my-biscotti-helpers" ::
-
-# :: coffee chapter title: "Once Upon A Time" ::
-
-Once upon a time, in a land far, far away…
-```
-
-## Installation
-
-It's the usual NPM deal.
-
-`npm i -s biscotti`
+- [biscotti-coffee](https://github.com/pandastrike/biscotti-coffee)
+- [biscotti-cpp](https://github.com/pandastrike/biscotti-cpp)
+- [biscotti-html](https://github.com/pandastrike/biscotti-html)
+- [biscotti-css](https://github.com/pandastrike/biscotti-css)
 
 ## Usage
 
-```coffee
-import assert from "assert"
-import {resolve} from "path"
-import fs from "fs"
-import biscotti from "../src/index"
+The `engine` function takes an array containing an initial definition of the engine and a list of mixins that will add capabilities to it. Typically, that initial definition defines the `sandbox` property, whose value must be a _sandbox_, which is a V8 VM. It returns a render function that takes an options object with either a `path` (and option `encoding`) or a `content` property.
 
-# pass in your require to import local packages
-process = biscotti {require}
+## Mixins
 
-# returns post-processed result
-process "./my-novel.bisc"
-```
+Mixins include:
 
-## API
+- `loader` - A dictionary of file types and descriptions for loading a file given a path. The `index` property determines whether to try adding `index` to the path. The `extensions` property is a list of extensions to try.
 
-### _biscotti [globals] &rarr; processor_
+- `fallback` - Defines the assumptions to make if no path is given. The default is to assume a CoffeeScript file. You can pass an options object with a `language` property to provide a different fallback.
 
-- _globals_ - An object whose properties will be available as global variables in a document's execution context. If you want to use `import`, you'll want to provide a `require` property, which should be a Node-compatible `require` function that takes a module name or absolute or relative path and returns the corresponding module's exports. Defaults to use the module's own `require`.
+- `include` — Adds an `include` method to the sandbox's globals. This allows a given file to include another file using a relative path. Effectively allows for the equivalent of partials, or partial templates.
 
-- _processor_ - a function for processing documents.
+- `buffer` — Adds functions to the sandbox's globals allowing included files to add values to a buffer. This way you can return values from the files your engine processes. The `get` function returns the buffer, in case you want to manipulate it from within a file. The `append` function adds to it. The `$$` function is equivalent to `append`. The `$` modifies another function so that it's return value is appended to the buffer.
 
-The default export of the biscotti module is a function that takes an optional `require` function and returns a processor function. What that means is that any updates to globals will be carried over from one call to the next.
+- `filters` — Includes various post-processing functions for transforming the buffer into a usable return value. `filters.string` converts each element into a string and appends it to single return string.
 
-A processor keeps its execution sanbox across invocations.
+- `embedded` — Allows you to process arbitrary text, embedding code between delimiters. You must provide an options object with the delimiters as `open` and `close` (which will default to `open` if undefined).  
 
-### _processor path, [options] &rarr; processed-document_
+## Language Support
 
-- _options_ - An object describing options for processing a given document.
-
-  - _text_ - If you already have the document you want to process in memory, you can simply pass it as an option. In this case, the _path_ argument is used only to resolve includes and for error messages. Defaults to the contents of the file at _path_.
-
-  - _encoding_ - String that determines the encoding used when reading the file. Defaults to `utf8`. Ingored when `text` option is provided.
-
-  - _open_ - String determining the open delimiter for code blocks. Defaults to `::`.
-
-  - _close_ - String determining the close delimiter for code blocks. Defaults to the value of _open_.
-
-- _processed-document_ -
+Biscotti supports JavaScript and CoffeeScript out of the box. You can add support for additional languages by adding definitions to the sanbox's generic `run` method. See the code for the [`sandbox`](./src/sandbox.coffee) and [`embedded`](./src/embedded.coffee) mixins for examples.
