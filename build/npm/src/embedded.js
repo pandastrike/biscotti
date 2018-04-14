@@ -49,10 +49,9 @@ exports.embedded = embedded = function (open, close) {
         if ((_ = close(content)) != null) {
           [block, content] = _;
           code.push(block.trim());
-          code.push(JSON.stringify(content));
         }
       }
-      code.push(JSON.stringify(content));
+      code.push("append" + JSON.stringify(content));
       unit.coffeescript = code.join("\n");
       return run(unit);
     });
