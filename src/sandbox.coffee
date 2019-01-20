@@ -1,6 +1,6 @@
 import vm from "vm"
 import coffeescript from "coffeescript"
-import {Method} from "fairmont-multimethods"
+import {Method} from "panda-generics"
 {define} = Method
 
 isCoffeeScript = (unit) -> unit.coffeescript? && !unit.javascript?
@@ -26,7 +26,7 @@ sandbox = (globals) ->
       coffeescript.compile unit.coffeescript,
         bare: true
         filename: unit.path
-        transpile: presets: [[ 'env', targets: node: "6.10" ]]
+        transpile: presets: [[ '@babel/env', targets: node: "8.10" ]]
     run unit
 
   _sandbox.run = run

@@ -1,6 +1,6 @@
 import fs from "fs"
 import {dirname, join} from "path"
-import {Method} from "fairmont-multimethods"
+import {Method} from "panda-generics"
 {define} = Method
 
 trim = (s) -> s.trim()

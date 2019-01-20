@@ -27,8 +27,8 @@ do ->
     test "from path", verify
       before: before
       actual: (render) -> render path: resolve "./test/files/index.biscotti"
-      expected: '# Greetings!\n\nThis is a test.\n\n\
-        Hello, Foo!\n\nGoodbye, now!'
+      expected: "# Greetings!\n\nThis is a test.\n\n\
+        Hello, Foo!\n\nGoodbye, now!"
 
     test "from content", verify
       before: before

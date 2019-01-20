@@ -1,4 +1,5 @@
-import {Method} from "fairmont-multimethods"
+import {isObject, isArray} from "panda-parchment"
+import {Method} from "panda-generics"
 {define} = Method
 
 # TODO: implement before, after, and wrap for generics
@@ -15,10 +16,15 @@ filter = (engine) ->
 
   define run, isNotFiltered, (unit) ->
     buffer = do get
+    unit.indent ?= 0
     unit.filter = ->
       result = ""
       for item in buffer
-        result += await item
+        i = await item
+        if i.replace?
+          result += i.replace /\n/g, ("\n" + " ".repeat unit.indent)
+        else
+          result += i
       do clear
       result
 
