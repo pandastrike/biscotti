@@ -1,26 +1,13 @@
 {
   "name": "biscotti",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": ".",
   "main": "build/npm/src/index.js",
-  "dependencies": {
-    "babel-core": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "coffeescript": "^2.2.2",
-    "fairmont-helpers": "^3.3.2",
-    "fairmont-multimethods": "^2.0.2",
-    "panda-vcss": "^1.0.0"
-  },
-  "devDependencies": {
-    "amen": "^2.0.5",
-    "gulp": "github:gulpjs/gulp#4.0",
-    "panda-builder": "^1.1.1",
-    "panda-vdom": "^1.0.0",
-    "power-assert": "^1.4.4"
-  },
-  "scripts": {
-    "test": "gulp npm:test"
-  },
+  "files": [
+    "build/npm/src",
+    "LICENSE"
+  ],
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pandastrike/biscotti.git"
@@ -37,5 +24,17 @@
   "bugs": {
     "url": "https://github.com/pandastrike/biscotti/issues"
   },
-  "homepage": "https://github.com/pandastrike/biscotti#readme"
+  "homepage": "https://github.com/pandastrike/biscotti#readme",
+  "dependencies": {
+    "coffeescript": "^2.3.2",
+    "panda-generics": "^4.2.0",
+    "panda-parchment": "^4.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.0",
+    "amen": "^2.0.5",
+    "panda-9000": "^4.4.0",
+    "panda-builder": "^3.2.1"
+  }
 }

@@ -1,4 +1,4 @@
-import {Method} from "fairmont-multimethods"
+import {Method} from "panda-generics"
 {define} = Method
 
 isUnknown = (unit) -> unit.content? && !unit.path? && !unit.language?

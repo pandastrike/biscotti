@@ -1,4 +1,4 @@
-import {Method} from "fairmont-multimethods"
+import {Method} from "panda-generics"
 
 include "greeting"
 

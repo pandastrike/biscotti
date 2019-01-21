@@ -2,6 +2,7 @@
 logs
 *.log
 *.log*
+build/
 
 # Dependency directories
 node_modules/
