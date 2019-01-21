@@ -10,6 +10,11 @@ split = (delimiter) ->
     else
       undefined
 
+splice = (string, start, deleteCount, items...) ->
+  pre = string[0...start]
+  post = string[(start + deleteCount)...]
+  pre + items.join() + post
+
 readContextIndentation = (before) ->
   match = /(\r\n|\r|\n)([ ]+)$/.exec before
   if match?
