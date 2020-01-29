@@ -1,13 +1,15 @@
 {
   "name": "biscotti",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "description": ".",
   "main": "build/npm/src/index.js",
   "files": [
     "build/npm/src",
     "LICENSE"
   ],
-  "scripts": {},
+  "scripts": {
+    "test": "p9k npm:test"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/pandastrike/biscotti.git"

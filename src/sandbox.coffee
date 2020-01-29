@@ -7,7 +7,7 @@ isCoffeeScript = (unit) -> unit.coffeescript? && !unit.javascript?
 isJavaScript = (unit) -> unit.javascript?
 isSandbox = (sandbox) -> vm.isContext sandbox
 
-sandbox = (globals) ->
+sandbox = (globals, prepare = (->)) ->
 
   _sandbox = vm.createContext globals
 
@@ -17,6 +17,7 @@ sandbox = (globals) ->
       throw "biscotti: Don't know how to run [#{unit.path}]"
 
   define run, isJavaScript, (unit) ->
+    prepare _sandbox, unit
     vm.runInContext unit.javascript, _sandbox,
       filename: unit.path
       displayErrors: true
